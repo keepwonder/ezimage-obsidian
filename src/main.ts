@@ -86,17 +86,25 @@ export default class EzImagePlugin extends Plugin {
         const files = evt.dataTransfer?.files;
         if (!files || files.length === 0) return;
 
-        let handled = false;
+        // Collect image files synchronously before any await
+        const imageFiles: File[] = [];
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           if (file.type.startsWith('image/')) {
-            handled = true;
-            const data = await file.arrayBuffer();
-            await this.uploadAndInsert(editor, data, file.name, file.type);
+            imageFiles.push(file);
           }
         }
 
-        if (handled) evt.preventDefault();
+        if (imageFiles.length === 0) return;
+
+        // Must call preventDefault synchronously — calling it after await is too late
+        // because Obsidian's default handler runs in the same tick
+        evt.preventDefault();
+
+        for (const file of imageFiles) {
+          const data = await file.arrayBuffer();
+          await this.uploadAndInsert(editor, data, file.name, file.type);
+        }
       })
     );
 
