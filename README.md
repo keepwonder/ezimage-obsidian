@@ -6,7 +6,7 @@
   <p><b>Paste or drag an image — upload to the cloud or save to vault, your choice.</b></p>
 
   <p>
-    <img src="https://img.shields.io/badge/Version-1.0.3-blue.svg" alt="Version" />
+    <img src="https://img.shields.io/github/v/release/keepwonder/ezimage-obsidian?color=blue&label=Version" alt="Version" />
     <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
     <img src="https://img.shields.io/badge/Obsidian-%3E%3D0.15.0-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License" />
