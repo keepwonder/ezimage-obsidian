@@ -253,17 +253,59 @@ export default class EzImagePlugin extends Plugin {
       }
 
       const targetKey = generateFilePath(uploadName, this.settings.pathTemplate);
-      const result = await this.uploader.upload({ data: uploadData, fileName: targetKey, mimeType: uploadMime });
+      const result = await this.uploadWithRetry({ data: uploadData, fileName: targetKey, mimeType: uploadMime });
 
       editor.replaceSelection(`![image](${result.url})`);
       notice.hide();
       new Notice('EzImage: Upload successful ✓');
     } catch (e: unknown) {
       notice.hide();
-      const msg = e instanceof Error ? e.message : String(e);
-      new Notice(`EzImage: Upload failed — ${msg}`);
+      new Notice(this.formatUploadError(e));
       console.error('EzImage upload error:', e);
     }
+  }
+
+  /**
+   * Upload with up to 2 automatic retries for transient network errors.
+   * Credential / auth errors (4xx) are not retried — they require user action.
+   */
+  private async uploadWithRetry(
+    payload: Parameters<R2Uploader['upload']>[0],
+    maxRetries = 2
+  ): ReturnType<R2Uploader['upload']> {
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.uploader.upload(payload);
+      } catch (e: unknown) {
+        lastError = e;
+        // Don't retry on credential / permission errors (HTTP 4xx)
+        if (this.isAuthError(e)) throw e;
+        if (attempt < maxRetries) {
+          // Brief back-off: 1s, then 2s
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        }
+      }
+    }
+    throw lastError;
+  }
+
+  /** Returns true if the error looks like a credential / permission failure. */
+  private isAuthError(e: unknown): boolean {
+    const msg = e instanceof Error ? e.message : String(e);
+    return /40[13]|InvalidAccessKeyId|SignatureDoesNotMatch|AccessDenied/i.test(msg);
+  }
+
+  /** Produce a user-friendly error message, distinguishing auth vs network failures. */
+  private formatUploadError(e: unknown): string {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (this.isAuthError(e)) {
+      return 'EzImage: Auth failed — check your R2 credentials in Settings.';
+    }
+    if (/timeout|network|fetch|ECONNRESET|ENOTFOUND/i.test(msg)) {
+      return 'EzImage: Network error — upload failed after retries. Check your connection.';
+    }
+    return `EzImage: Upload failed — ${msg}`;
   }
 
   // ── Local Save Logic ───────────────────────────────────────────────────────
@@ -373,8 +415,10 @@ export default class EzImagePlugin extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+    // Apply locale FIRST so refreshStatusBar picks up the new language
     setLocale(this.settings.language);
+    this.refreshStatusBar();
+    // Only reset the uploader when R2 credentials/config actually change
     this._uploader = null;
-    this.refreshStatusBar(); // re-apply locale-aware title
   }
 }
