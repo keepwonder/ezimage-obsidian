@@ -58,6 +58,13 @@ interface Translations {
   // Status bar tooltips
   statusBarUploadTitle: string;
   statusBarLocalTitle: string;
+
+  // Validation messages
+  maxFileSizeMB: string;
+  maxFileSizeMBDesc: string;
+  errMaxWidth: string;
+  errMaxFileSizeMB: string;
+  pathTemplatePreviewLabel: string;
 }
 
 const en: Translations = {
@@ -97,6 +104,12 @@ const en: Translations = {
 
   statusBarUploadTitle: 'EzImage: Upload mode — change in Settings or Command Palette',
   statusBarLocalTitle:  'EzImage: Local Save mode — change in Settings or Command Palette',
+
+  maxFileSizeMB:        'Max File Size (MB)',
+  maxFileSizeMBDesc:    'Files larger than this will be rejected before upload. 0 = no limit.',
+  errMaxWidth:          '⚠ Must be a number ≥ 0',
+  errMaxFileSizeMB:     '⚠ Must be a number ≥ 0',
+  pathTemplatePreviewLabel: 'Preview: ',
 };
 
 const zh: Translations = {
@@ -136,6 +149,12 @@ const zh: Translations = {
 
   statusBarUploadTitle: 'EzImage：上传模式 — 在设置或命令面板中切换',
   statusBarLocalTitle:  'EzImage：本地保存模式 — 在设置或命令面板中切换',
+
+  maxFileSizeMB:        '最大文件大小（MB）',
+  maxFileSizeMBDesc:    '超过此大小的文件将在上传前被拒绝。0 表示不限制。',
+  errMaxWidth:          '⚠ 请输入 ≥ 0 的数字',
+  errMaxFileSizeMB:     '⚠ 请输入 ≥ 0 的数字',
+  pathTemplatePreviewLabel: '预览：',
 };
 
 const locales = { en, zh };

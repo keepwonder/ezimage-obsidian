@@ -30,6 +30,7 @@ export interface EzImageSettings {
   compress: boolean;
   maxWidth: number;
   quality: number;
+  maxFileSizeMB: number;   // 0 = no limit
   localSaveByDefault: boolean;
   language: AppLanguage;
 }
@@ -47,6 +48,7 @@ export const DEFAULT_SETTINGS: EzImageSettings = {
   compress: true,
   maxWidth: 1920,
   quality: 85,
+  maxFileSizeMB: 20,
   localSaveByDefault: false,
   language: 'auto',
 };

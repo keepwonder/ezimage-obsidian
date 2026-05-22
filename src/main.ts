@@ -105,13 +105,16 @@ export default class EzImagePlugin extends Plugin {
       if (!view) return;
 
       (async () => {
-        for (const imageItem of imageItems) {
-          const file = imageItem.getAsFile();
-          if (file) {
-            const data = await file.arrayBuffer();
-            await this.uploadAndInsert(view.editor, data, file.name, file.type);
-          }
-        }
+        await this.runWithConcurrency(
+          imageItems
+            .map(imageItem => async () => {
+              const file = imageItem.getAsFile();
+              if (file) {
+                const data = await file.arrayBuffer();
+                await this.uploadAndInsert(view.editor, data, file.name, file.type);
+              }
+            })
+        );
       })();
     }, true);
 
@@ -142,14 +145,16 @@ export default class EzImagePlugin extends Plugin {
       if (!view) return;
 
       (async () => {
-        for (const file of imageFiles) {
-          if (this.settings.localSaveByDefault) {
-            await this.saveToVault(view, file);
-          } else {
-            const data = await file.arrayBuffer();
-            await this.uploadAndInsert(view.editor, data, file.name, file.type);
-          }
-        }
+        await this.runWithConcurrency(
+          imageFiles.map(file => async () => {
+            if (this.settings.localSaveByDefault) {
+              await this.saveToVault(view, file);
+            } else {
+              const data = await file.arrayBuffer();
+              await this.uploadAndInsert(view.editor, data, file.name, file.type);
+            }
+          })
+        );
       })();
     }, true);
 
@@ -215,6 +220,14 @@ export default class EzImagePlugin extends Plugin {
     fileName: string,
     mimeType: string
   ) {
+    // File size guard (before compression)
+    const limitMB = this.settings.maxFileSizeMB;
+    if (limitMB > 0 && data.byteLength > limitMB * 1024 * 1024) {
+      const sizeMB = (data.byteLength / 1024 / 1024).toFixed(1);
+      new Notice(`EzImage: File too large (${sizeMB} MB). Limit is ${limitMB} MB — adjust in Settings.`);
+      return;
+    }
+
     const notice = new Notice('EzImage: Uploading…', 0);
 
     try {
@@ -296,6 +309,24 @@ export default class EzImagePlugin extends Plugin {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
+
+  /**
+   * Run an array of async tasks with a maximum concurrency limit.
+   * Prevents overwhelming the network or R2 rate limits when many images are pasted at once.
+   */
+  private async runWithConcurrency<T>(
+    tasks: (() => Promise<T>)[],
+    limit = 3
+  ): Promise<void> {
+    const queue = [...tasks];
+    const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+      while (queue.length > 0) {
+        const task = queue.shift();
+        if (task) await task();
+      }
+    });
+    await Promise.all(workers);
+  }
 
   /** Refresh the status bar to reflect the current mode. */
   refreshStatusBar(): void {

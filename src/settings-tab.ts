@@ -2,6 +2,7 @@ import { App, PluginSettingTab, Setting } from 'obsidian';
 import type EzImagePlugin from './main';
 import type { AppLanguage } from './types';
 import { t, setLocale } from './i18n';
+import { generateFilePath } from './utils';
 
 export class EzImageSettingsTab extends PluginSettingTab {
   plugin: EzImagePlugin;
@@ -95,6 +96,17 @@ export class EzImageSettingsTab extends PluginSettingTab {
     // ── Image Processing ─────────────────────────────────────────────────────
     containerEl.createEl('h3', { text: t('sectionProcessing') });
 
+    // Path template with live preview
+    const templatePreviewEl = containerEl.createEl('p', {
+      cls: 'setting-item-description',
+      text: t('pathTemplatePreviewLabel') + generateFilePath('example.png', this.plugin.settings.pathTemplate),
+    });
+    templatePreviewEl.style.marginTop = '-8px';
+    templatePreviewEl.style.marginBottom = '8px';
+    templatePreviewEl.style.fontFamily = 'monospace';
+    templatePreviewEl.style.fontSize = '0.85em';
+    templatePreviewEl.style.opacity = '0.7';
+
     new Setting(containerEl)
       .setName(t('pathTemplate'))
       .setDesc(t('pathTemplateDesc'))
@@ -103,7 +115,10 @@ export class EzImageSettingsTab extends PluginSettingTab {
           .setPlaceholder('{yyyy}/{MM}/{timestamp}-{random}.{ext}')
           .setValue(this.plugin.settings.pathTemplate)
           .onChange(async value => {
-            this.plugin.settings.pathTemplate = value.trim() || '{yyyy}/{MM}/{timestamp}-{random}.{ext}';
+            const tpl = value.trim() || '{yyyy}/{MM}/{timestamp}-{random}.{ext}';
+            this.plugin.settings.pathTemplate = tpl;
+            // Live preview update
+            templatePreviewEl.textContent = t('pathTemplatePreviewLabel') + generateFilePath('example.png', tpl);
             await this.plugin.saveSettings();
           })
       );
@@ -118,21 +133,34 @@ export class EzImageSettingsTab extends PluginSettingTab {
         })
       );
 
+    // Max width with validation
+    const maxWidthErrEl = containerEl.createEl('p', { cls: 'setting-item-description' });
+    maxWidthErrEl.style.color = 'var(--color-red)';
+    maxWidthErrEl.style.marginTop = '-8px';
+    maxWidthErrEl.style.marginBottom = '8px';
+    maxWidthErrEl.style.display = 'none';
+
     new Setting(containerEl)
       .setName(t('maxWidth'))
       .setDesc(t('maxWidthDesc'))
-      .addText(text =>
+      .addText(text => {
         text
           .setPlaceholder('1920')
           .setValue(String(this.plugin.settings.maxWidth))
           .onChange(async value => {
             const num = parseInt(value, 10);
-            if (!isNaN(num) && num >= 0) {
+            if (isNaN(num) || num < 0) {
+              maxWidthErrEl.textContent = t('errMaxWidth');
+              maxWidthErrEl.style.display = 'block';
+            } else {
+              maxWidthErrEl.style.display = 'none';
               this.plugin.settings.maxWidth = num;
               await this.plugin.saveSettings();
             }
-          })
-      );
+          });
+        text.inputEl.style.width = '80px';
+        return text;
+      });
 
     new Setting(containerEl)
       .setName(t('quality'))
@@ -147,6 +175,35 @@ export class EzImageSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    // Max file size with validation
+    const maxSizeErrEl = containerEl.createEl('p', { cls: 'setting-item-description' });
+    maxSizeErrEl.style.color = 'var(--color-red)';
+    maxSizeErrEl.style.marginTop = '-8px';
+    maxSizeErrEl.style.marginBottom = '8px';
+    maxSizeErrEl.style.display = 'none';
+
+    new Setting(containerEl)
+      .setName(t('maxFileSizeMB'))
+      .setDesc(t('maxFileSizeMBDesc'))
+      .addText(text => {
+        text
+          .setPlaceholder('20')
+          .setValue(String(this.plugin.settings.maxFileSizeMB))
+          .onChange(async value => {
+            const num = parseInt(value, 10);
+            if (isNaN(num) || num < 0) {
+              maxSizeErrEl.textContent = t('errMaxFileSizeMB');
+              maxSizeErrEl.style.display = 'block';
+            } else {
+              maxSizeErrEl.style.display = 'none';
+              this.plugin.settings.maxFileSizeMB = num;
+              await this.plugin.saveSettings();
+            }
+          });
+        text.inputEl.style.width = '80px';
+        return text;
+      });
 
     // ── General ───────────────────────────────────────────────────────────────
     containerEl.createEl('h3', { text: t('sectionGeneral') });
@@ -176,7 +233,6 @@ export class EzImageSettingsTab extends PluginSettingTab {
           .onChange(async value => {
             this.plugin.settings.language = value as AppLanguage;
             await this.plugin.saveSettings();
-            // Update locale and re-render the settings page immediately
             setLocale(this.plugin.settings.language);
             this.display();
           })

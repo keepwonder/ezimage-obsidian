@@ -29,9 +29,8 @@ export function generateFilePath(originalName: string, template: string): string
 
   let result = template;
   for (const [key, value] of Object.entries(variables)) {
-    // Escape curly braces for regex
-    const escaped = key.replace(/\{/g, '\\{').replace(/\}/g, '\\}');
-    result = result.replace(new RegExp(escaped, 'g'), value);
+    // Use split/join instead of RegExp to avoid regex injection from filenames
+    result = result.split(key).join(value);
   }
   return result;
 }
