@@ -37,7 +37,9 @@
 - **☁️ Upload Mode** — Images are uploaded to Cloudflare R2 and a `![image](url)` link is inserted. Zero local files, zero broken paths.
 - **💾 Local Save Mode** — Images are saved to your vault's configured attachment folder and inserted as `![[wikilink]]`. Fully managed by Obsidian's native structure.
 - **⚡ Mode Toggle** — Switch between Upload and Local Save mode via the Settings toggle or Command Palette (`EzImage: Toggle Local Save Mode`). The status bar always shows the current mode at a glance.
-- **📉 Automatic WebP Compression** — Powered by `browser-image-compression`. Images are converted to WebP and resized before upload, reducing file size without visible quality loss.
+- **📉 Automatic WebP Compression** — Powered by `browser-image-compression`. Images are converted to WebP and resized before upload, reducing file size without visible quality loss. EXIF metadata is stripped automatically during conversion.
+- **🔏 EXIF Metadata Stripping** — When compression is disabled, EzImage redraws the image via Canvas before upload, removing GPS location, device info, and other metadata. No extra dependency required.
+- **🛡️ Upload Reliability** — Failed uploads are automatically retried up to 2 times with back-off. Credential errors surface a clear "check Settings" message; network errors prompt to check your connection.
 - **📂 Flexible Path Templates** — Full control over the upload path using variables: `{yyyy}` `{MM}` `{dd}` `{timestamp}` `{random}` `{name}` `{ext}`.
 - **🌐 Language Support** — Settings UI available in English and 中文, or auto-detected from Obsidian.
 - **🔒 Local Signing** — AWS Signature V4 is computed entirely on-device using the Web Crypto API. Your credentials never leave your machine.
@@ -80,10 +82,12 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 
 | Option | Default | Description |
 | :--- | :--- | :--- |
-| **Compress Images** | `true` | Convert to WebP before upload |
+| **Compress Images** | `on` | Convert to WebP before upload — also strips EXIF automatically |
+| **Strip EXIF Metadata** | `on` | Remove GPS, device info, and other metadata. Only applies when compression is off (compression already strips EXIF via WebP conversion) |
 | **Max Width** | `1920` | Resize if wider than this (px). `0` = no limit |
 | **Quality** | `85` | WebP quality (1–100) |
-| **Path Template** | `{yyyy}/{MM}/{timestamp}-{random}.{ext}` | Upload path pattern |
+| **Max File Size (MB)** | `20` | Files larger than this are rejected before upload. `0` = no limit |
+| **Path Template** | `{yyyy}/{MM}/{timestamp}-{random}.{ext}` | Upload path pattern — live preview shown in Settings |
 
 **Template variables:** `{yyyy}` `{MM}` `{dd}` `{hh}` `{mm}` `{ss}` `{timestamp}` `{random}` `{name}` `{ext}`
 
@@ -121,11 +125,14 @@ To switch modes, use the **Settings toggle** or **Command Palette → `EzImage: 
 ## <span id="roadmap"></span>🗺️ Roadmap
 
 - [x] Cloudflare R2 support
-- [x] Automatic WebP compression
+- [x] Automatic WebP compression with EXIF stripping
 - [x] Paste & drag-drop interception
-- [x] Flexible path templates
-- [x] Local Save mode with status bar toggle
+- [x] Flexible path templates with live preview
+- [x] Local Save mode with status bar indicator
 - [x] Language support (EN / 中文)
+- [x] File size limit & input validation
+- [x] Auto-retry on network errors
+- [x] EXIF metadata stripping (when compression is off)
 - [ ] AWS S3 / generic S3-compatible providers
 - [ ] Aliyun OSS & Tencent COS
 - [ ] GitHub / Gitee image hosting mode

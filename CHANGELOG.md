@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-05-22
+
+### Added
+- EXIF metadata stripping: GPS location, device info, and other metadata are removed before upload via Canvas redraw (no extra dependency)
+- `Strip EXIF Metadata` toggle in Image Processing settings (default: on)
+- When compression is enabled, EXIF is already stripped naturally by the WebP conversion — the new toggle only applies when compression is off
+- Auto-retry on upload: up to 2 retries with 1 s / 2 s back-off for transient network errors; credential errors (4xx) are not retried
+- Smarter error messages: auth failures prompt to check Settings; network errors prompt to check connection
+- File size limit: configurable `Max File Size (MB)` setting (default: 20 MB); oversized files are rejected before upload with a clear notice
+- Live path template preview in Settings — updates on every keystroke
+- Inline validation for `Max Width` and `Max File Size` inputs
+
+### Fixed
+- Regex injection: path template variable substitution now uses `split/join` instead of `new RegExp()`, preventing filenames with special characters from breaking the template
+- Concurrent upload limit: paste/drop now processes at most 3 images simultaneously to avoid overwhelming R2 rate limits
+- Status bar tooltip language now updates immediately when language is changed in Settings (locale was previously applied after the status bar refresh)
+
 ## [1.0.3] - 2026-05-22
 
 ### Added
