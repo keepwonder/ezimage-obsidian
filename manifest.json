@@ -1,0 +1,10 @@
+{
+  "id": "ezimage",
+  "name": "EzImage",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Upload images to cloud storage (R2/S3) with automatic compression. Paste or drag images to get a Markdown link instantly.",
+  "author": "Kiang",
+  "authorUrl": "https://keepwonder.top",
+  "isDesktopOnly": false
+}
