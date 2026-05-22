@@ -6,7 +6,7 @@
   <p><b>粘贴或拖拽图片 — 自动上传到云端并插入 Markdown 链接</b></p>
 
   <p>
-    <img src="https://img.shields.io/badge/版本-1.0.2-blue.svg" alt="Version" />
+    <img src="https://img.shields.io/badge/版本-1.0.3-blue.svg" alt="Version" />
     <img src="https://img.shields.io/badge/平台-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
     <img src="https://img.shields.io/badge/Obsidian-%3E%3D0.15.0-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/许可证-MIT-orange.svg" alt="License" />
