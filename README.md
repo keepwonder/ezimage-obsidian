@@ -1,3 +1,5 @@
+# EzImage
+
 <div align="center">
   <img src="https://images.flashnote.top/2026/02/icon.png" width="128" alt="EzImage Logo" />
   <h1>EzImage for Obsidian</h1>
