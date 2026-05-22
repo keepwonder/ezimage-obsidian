@@ -36,7 +36,7 @@
 - **🖱️ Drag & Drop Support** — Drag image files directly from Finder / Explorer into the editor. EzImage copies the file into your vault or uploads it — not just references the original path.
 - **☁️ Upload Mode** — Images are uploaded to Cloudflare R2 and a `![image](url)` link is inserted. Zero local files, zero broken paths.
 - **💾 Local Save Mode** — Images are saved to your vault's configured attachment folder and inserted as `![[wikilink]]`. Fully managed by Obsidian's native structure.
-- **⚡ One-Click Mode Toggle** — Click the status bar item (`☁ EzImage` / `🖴 Local Save`) to switch modes instantly. The setting persists across restarts and stays in sync with the Settings page.
+- **⚡ Mode Toggle** — Switch between Upload and Local Save mode via the Settings toggle or Command Palette (`EzImage: Toggle Local Save Mode`). The status bar always shows the current mode at a glance.
 - **📉 Automatic WebP Compression** — Powered by `browser-image-compression`. Images are converted to WebP and resized before upload, reducing file size without visible quality loss.
 - **📂 Flexible Path Templates** — Full control over the upload path using variables: `{yyyy}` `{MM}` `{dd}` `{timestamp}` `{random}` `{name}` `{ext}`.
 - **🌐 Language Support** — Settings UI available in English and 中文, or auto-detected from Obsidian.
@@ -102,19 +102,19 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 | **Drag & drop** | Drag image file(s) from your file manager into the editor |
 | **Upload from file** | Command Palette → `EzImage: Upload Image from File` |
 | **Upload clipboard** | Command Palette → `EzImage: Upload Clipboard Image` |
-| **Toggle mode** | Click the status bar item, or Command Palette → `EzImage: Toggle Local Save Mode` |
+| **Toggle mode** | Settings toggle, or Command Palette → `EzImage: Toggle Local Save Mode` |
 | **Context menu** | Right-click in editor → EzImage options |
 
 ### Status Bar
 
-The status bar item reflects the current mode at a glance:
+The status bar item is a **read-only indicator** of the current mode:
 
 | Display | Mode |
 | :--- | :--- |
 | `☁ EzImage` (dimmed) | Upload mode — images go to R2 |
 | `🖴 Local Save` (bright) | Local Save mode — images go to vault |
 
-Click it to toggle. The change is saved immediately and the Settings page stays in sync.
+To switch modes, use the **Settings toggle** or **Command Palette → `EzImage: Toggle Local Save Mode`** (bindable to a hotkey). The tooltip follows your configured language.
 
 > **Note:** EzImage only intercepts paste/drop events when R2 is configured. If credentials are missing, Obsidian's default behaviour (local save) is preserved regardless of mode.
 

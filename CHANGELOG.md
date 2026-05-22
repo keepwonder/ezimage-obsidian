@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-05-22
+
+### Added
+- Local Save mode: paste and drag-drop now route to vault when enabled, inserting `![[wikilink]]` instead of uploading
+- Status bar indicator showing current mode (`☁ EzImage` / `🖴 Local Save`)
+- Status bar tooltip follows the configured language (EN / 中文 / Auto)
+- `Toggle Local Save Mode` command in Command Palette
+- Settings UI available in English and 中文, with Auto (follow Obsidian) option
+- `Default to Local Save mode` toggle in General settings — persists across restarts
+
+### Changed
+- Status bar is now a read-only indicator; mode switching is done via Settings toggle or Command Palette
+- `localSaveDefaultDesc` copy updated to reference Command Palette instead of status bar
+
+### Fixed
+- Drag & drop bypass modifier key removed — replaced by persistent mode toggle that works reliably across all input methods
+
 ## [1.0.2] - 2026-05-22
 
 ### Fixed

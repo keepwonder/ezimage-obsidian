@@ -1,5 +1,7 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import type EzImagePlugin from './main';
+import type { AppLanguage } from './types';
+import { t, setLocale } from './i18n';
 
 export class EzImageSettingsTab extends PluginSettingTab {
   plugin: EzImagePlugin;
@@ -14,18 +16,18 @@ export class EzImageSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     // ── Header ──────────────────────────────────────────────────────────────
-    containerEl.createEl('h2', { text: 'EzImage Settings' });
+    containerEl.createEl('h2', { text: t('settingsTitle') });
     containerEl.createEl('p', {
-      text: 'Upload images to Cloudflare R2 and get a Markdown link automatically.',
+      text: t('settingsDesc'),
       cls: 'setting-item-description',
     });
 
     // ── Cloudflare R2 ────────────────────────────────────────────────────────
-    containerEl.createEl('h3', { text: 'Cloudflare R2' });
+    containerEl.createEl('h3', { text: t('sectionR2') });
 
     new Setting(containerEl)
-      .setName('Account ID')
-      .setDesc('Your Cloudflare Account ID')
+      .setName(t('accountId'))
+      .setDesc(t('accountIdDesc'))
       .addText(text =>
         text
           .setPlaceholder('a1b2c3d4...')
@@ -37,8 +39,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Access Key ID')
-      .setDesc('R2 API Access Key ID')
+      .setName(t('accessKeyId'))
+      .setDesc(t('accessKeyIdDesc'))
       .addText(text =>
         text
           .setPlaceholder('Enter Access Key ID')
@@ -50,8 +52,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Secret Access Key')
-      .setDesc('R2 API Secret Access Key')
+      .setName(t('secretAccessKey'))
+      .setDesc(t('secretAccessKeyDesc'))
       .addText(text => {
         text
           .setPlaceholder('Enter Secret Access Key')
@@ -65,8 +67,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName('Bucket Name')
-      .setDesc('R2 Bucket Name')
+      .setName(t('bucketName'))
+      .setDesc(t('bucketNameDesc'))
       .addText(text =>
         text
           .setPlaceholder('my-images')
@@ -78,8 +80,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Public URL')
-      .setDesc('Your bucket\'s public URL, e.g. https://pub-xxx.r2.dev or a custom domain')
+      .setName(t('publicUrl'))
+      .setDesc(t('publicUrlDesc'))
       .addText(text =>
         text
           .setPlaceholder('https://images.example.com')
@@ -91,14 +93,11 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     // ── Image Processing ─────────────────────────────────────────────────────
-    containerEl.createEl('h3', { text: 'Image Processing' });
+    containerEl.createEl('h3', { text: t('sectionProcessing') });
 
     new Setting(containerEl)
-      .setName('Path Template')
-      .setDesc(
-        'Template for the uploaded file path. ' +
-          'Variables: {yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}'
-      )
+      .setName(t('pathTemplate'))
+      .setDesc(t('pathTemplateDesc'))
       .addText(text =>
         text
           .setPlaceholder('{yyyy}/{MM}/{timestamp}-{random}.{ext}')
@@ -110,8 +109,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Compress Images')
-      .setDesc('Convert images to WebP and reduce file size before uploading')
+      .setName(t('compress'))
+      .setDesc(t('compressDesc'))
       .addToggle(toggle =>
         toggle.setValue(this.plugin.settings.compress).onChange(async value => {
           this.plugin.settings.compress = value;
@@ -120,8 +119,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Max Width (px)')
-      .setDesc('Images wider than this will be resized. 0 = no limit.')
+      .setName(t('maxWidth'))
+      .setDesc(t('maxWidthDesc'))
       .addText(text =>
         text
           .setPlaceholder('1920')
@@ -136,8 +135,8 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName('Quality')
-      .setDesc('WebP compression quality: 1 (smallest) → 100 (best)')
+      .setName(t('quality'))
+      .setDesc(t('qualityDesc'))
       .addSlider(slider =>
         slider
           .setLimits(1, 100, 1)
@@ -146,6 +145,40 @@ export class EzImageSettingsTab extends PluginSettingTab {
           .onChange(async value => {
             this.plugin.settings.quality = value;
             await this.plugin.saveSettings();
+          })
+      );
+
+    // ── General ───────────────────────────────────────────────────────────────
+    containerEl.createEl('h3', { text: t('sectionGeneral') });
+
+    new Setting(containerEl)
+      .setName(t('localSaveDefault'))
+      .setDesc(t('localSaveDefaultDesc'))
+      .addToggle(toggle =>
+        toggle
+          .setValue(this.plugin.settings.localSaveByDefault)
+          .onChange(async value => {
+            this.plugin.settings.localSaveByDefault = value;
+            await this.plugin.saveSettings();
+            this.plugin.refreshStatusBar();
+          })
+      );
+
+    new Setting(containerEl)
+      .setName(t('language'))
+      .setDesc(t('languageDesc'))
+      .addDropdown(drop =>
+        drop
+          .addOption('auto', t('langAuto'))
+          .addOption('en',   t('langEn'))
+          .addOption('zh',   t('langZh'))
+          .setValue(this.plugin.settings.language)
+          .onChange(async value => {
+            this.plugin.settings.language = value as AppLanguage;
+            await this.plugin.saveSettings();
+            // Update locale and re-render the settings page immediately
+            setLocale(this.plugin.settings.language);
+            this.display();
           })
       );
   }

@@ -21,6 +21,8 @@ export interface R2Config {
   publicUrl: string;
 }
 
+export type AppLanguage = 'auto' | 'en' | 'zh';
+
 export interface EzImageSettings {
   provider: 'r2';
   r2: R2Config;
@@ -28,6 +30,8 @@ export interface EzImageSettings {
   compress: boolean;
   maxWidth: number;
   quality: number;
+  localSaveByDefault: boolean;
+  language: AppLanguage;
 }
 
 export const DEFAULT_SETTINGS: EzImageSettings = {
@@ -43,4 +47,6 @@ export const DEFAULT_SETTINGS: EzImageSettings = {
   compress: true,
   maxWidth: 1920,
   quality: 85,
+  localSaveByDefault: false,
+  language: 'auto',
 };

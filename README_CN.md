@@ -34,7 +34,7 @@
 
 - **🖼️ 无感粘贴拦截** — 在笔记中粘贴图片，EzImage 在 Obsidian 本地保存之前拦截事件，上传图片并自动插入 `![image](url)`。
 - **🖱️ 拖拽上传** — 直接从 Finder / 文件管理器将图片拖入编辑器，自动上传。
-- **💾 本地保存模式** — 点击状态栏的 ☁️ 图标切换到 💾 本地保存模式，此时粘贴和拖拽均走 Obsidian 默认行为，图片保存到 vault 本地。再次点击恢复上传模式。
+- **💾 本地保存模式** — 在设置页开启或通过命令面板（`EzImage: Toggle Local Save Mode`）切换到本地保存模式，此时粘贴和拖拽均走 Obsidian 默认行为，图片保存到 vault 本地。状态栏始终显示当前模式。
 - **📉 自动 WebP 压缩** — 基于 `browser-image-compression`，上传前自动转为 WebP 并按需缩放，在不损失可见质量的前提下大幅压缩体积。
 - **📂 灵活路径模板** — 通过变量完全控制上传路径：`{yyyy}` `{MM}` `{dd}` `{timestamp}` `{random}` `{name}` `{ext}`。
 - **☁️ Cloudflare R2** — 零出口流量费，S3 兼容 API，全球 CDN。更多云存储提供商即将支持。
@@ -97,17 +97,21 @@
 | :--- | :--- |
 | **粘贴图片** | 复制任意图片 → 在编辑器中粘贴，自动触发上传 |
 | **拖拽上传** | 从文件管理器拖拽图片文件到编辑器 |
-| **切换模式** | 点击状态栏 ☁️ / 💾 图标，或命令面板 → `EzImage: Toggle Local Save Mode` |
+| **切换模式** | 设置页面 toggle，或命令面板 → `EzImage: Toggle Local Save Mode` |
 | **从文件上传** | 命令面板 → `EzImage: Upload Image from File` |
 | **上传剪贴板** | 命令面板 → `EzImage: Upload Clipboard Image` |
 | **右键菜单** | 在编辑器中右键 → EzImage 选项 |
 
 ### 状态栏说明
 
+状态栏是**只读指示器**，显示当前模式：
+
 | 图标 | 模式 | 行为 |
 | :--- | :--- | :--- |
 | ☁️ EzImage | 上传模式（默认）| 粘贴 / 拖拽 → 上传到 R2，插入 `![image](url)` |
 | 💾 Local Save | 本地保存模式 | 粘贴 / 拖拽 → 保存到 vault，插入 `![[filename]]` |
+
+切换模式请使用**设置页面 toggle** 或**命令面板 → `EzImage: Toggle Local Save Mode`**（可绑定快捷键）。状态栏 tooltip 跟随配置的语言显示。
 
 > **注意：** 只有在 R2 配置完成后，EzImage 才会拦截事件。未配置时，Obsidian 的默认行为（本地保存）不受影响。
 
