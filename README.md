@@ -3,10 +3,10 @@
 <div align="center">
   <img src="https://images.flashnote.top/2026/02/icon.png" width="128" alt="EzImage Logo" />
   <h1>EzImage for Obsidian</h1>
-  <p><b>Paste or drag an image — it uploads to the cloud and inserts a Markdown link. Nothing saved locally.</b></p>
+  <p><b>Paste or drag an image — upload to the cloud or save to vault, your choice.</b></p>
 
   <p>
-    <img src="https://img.shields.io/badge/Version-1.0.0-blue.svg" alt="Version" />
+    <img src="https://img.shields.io/badge/Version-1.0.2-blue.svg" alt="Version" />
     <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
     <img src="https://img.shields.io/badge/Obsidian-%3E%3D0.15.0-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License" />
@@ -28,15 +28,18 @@
 
 ---
 
-**EzImage for Obsidian** solves the fundamental pain point of image management in Obsidian: by default, pasted images are saved as local files that clutter your vault. EzImage intercepts every paste and drop event, uploads the image to your cloud storage, and inserts a clean Markdown link — keeping your vault free of binary files.
+**EzImage for Obsidian** solves the fundamental pain point of image management in Obsidian: pasted images pollute your vault with local binary files, or worse, reference paths that break across machines. EzImage intercepts every paste and drop event and either uploads the image to your cloud storage (inserting a clean Markdown URL) or saves it to the vault via a wikilink — whichever mode you prefer, switchable at any time from the status bar.
 
 ## <span id="features"></span>✨ Features
 
-- **🖼️ Seamless Paste Interception** — Paste an image anywhere in your notes; EzImage intercepts the event before Obsidian can save it locally, uploads it, and inserts `![image](url)` at the cursor.
-- **🖱️ Drag & Drop Support** — Drag image files directly from Finder / Explorer into the editor for automatic upload.
+- **🖼️ Seamless Paste Interception** — Paste an image anywhere in your notes; EzImage intercepts the event before Obsidian, then either uploads it or saves it locally depending on the current mode.
+- **🖱️ Drag & Drop Support** — Drag image files directly from Finder / Explorer into the editor. EzImage copies the file into your vault or uploads it — not just references the original path.
+- **☁️ Upload Mode** — Images are uploaded to Cloudflare R2 and a `![image](url)` link is inserted. Zero local files, zero broken paths.
+- **💾 Local Save Mode** — Images are saved to your vault's configured attachment folder and inserted as `![[wikilink]]`. Fully managed by Obsidian's native structure.
+- **⚡ One-Click Mode Toggle** — Click the status bar item (`☁ EzImage` / `🖴 Local Save`) to switch modes instantly. The setting persists across restarts and stays in sync with the Settings page.
 - **📉 Automatic WebP Compression** — Powered by `browser-image-compression`. Images are converted to WebP and resized before upload, reducing file size without visible quality loss.
 - **📂 Flexible Path Templates** — Full control over the upload path using variables: `{yyyy}` `{MM}` `{dd}` `{timestamp}` `{random}` `{name}` `{ext}`.
-- **☁️ Cloudflare R2** — Zero egress fees, S3-compatible API, global CDN. More providers coming.
+- **🌐 Language Support** — Settings UI available in English and 中文, or auto-detected from Obsidian.
 - **🔒 Local Signing** — AWS Signature V4 is computed entirely on-device using the Web Crypto API. Your credentials never leave your machine.
 
 ## <span id="install"></span>📦 Installation
@@ -54,7 +57,9 @@
 
 ## <span id="config"></span>⚙️ Configuration
 
-Open **Settings → EzImage** and fill in your Cloudflare R2 credentials:
+Open **Settings → EzImage** and fill in your credentials and preferences.
+
+### Cloudflare R2
 
 | Field | Description |
 | :--- | :--- |
@@ -64,14 +69,14 @@ Open **Settings → EzImage** and fill in your Cloudflare R2 credentials:
 | **Bucket Name** | The R2 bucket to upload images into |
 | **Public URL** | Your bucket's public URL, e.g. `https://pub-xxx.r2.dev` or a custom domain |
 
-### How to get R2 credentials
+#### How to get R2 credentials
 
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → **R2 → Manage API tokens**.
 2. Create a token with **Object Read & Write** permission scoped to your bucket.
 3. Copy **Account ID**, **Access Key ID**, and **Secret Access Key**.
 4. Make sure your bucket has **Public Access** enabled (or use a custom domain with a Worker).
 
-### Image Processing Options
+### Image Processing
 
 | Option | Default | Description |
 | :--- | :--- | :--- |
@@ -82,17 +87,36 @@ Open **Settings → EzImage** and fill in your Cloudflare R2 credentials:
 
 **Template variables:** `{yyyy}` `{MM}` `{dd}` `{hh}` `{mm}` `{ss}` `{timestamp}` `{random}` `{name}` `{ext}`
 
+### General
+
+| Option | Default | Description |
+| :--- | :--- | :--- |
+| **Default to Local Save mode** | `off` | When enabled, images are saved to your vault by default instead of being uploaded. Can be toggled at any time via the status bar. |
+| **Language** | `Auto` | Language used in the settings panel. Options: Auto (follow Obsidian), English, 中文. |
+
 ## <span id="usage"></span>🚀 Usage
 
 | Action | How |
 | :--- | :--- |
-| **Paste image** | Copy any image → paste in editor — upload happens automatically |
+| **Paste image** | Copy any image → paste in editor — processed automatically based on current mode |
 | **Drag & drop** | Drag image file(s) from your file manager into the editor |
 | **Upload from file** | Command Palette → `EzImage: Upload Image from File` |
 | **Upload clipboard** | Command Palette → `EzImage: Upload Clipboard Image` |
+| **Toggle mode** | Click the status bar item, or Command Palette → `EzImage: Toggle Local Save Mode` |
 | **Context menu** | Right-click in editor → EzImage options |
 
-> **Note:** EzImage only intercepts events when R2 is configured. If credentials are missing, Obsidian's default behaviour (local save) is preserved.
+### Status Bar
+
+The status bar item reflects the current mode at a glance:
+
+| Display | Mode |
+| :--- | :--- |
+| `☁ EzImage` (dimmed) | Upload mode — images go to R2 |
+| `🖴 Local Save` (bright) | Local Save mode — images go to vault |
+
+Click it to toggle. The change is saved immediately and the Settings page stays in sync.
+
+> **Note:** EzImage only intercepts paste/drop events when R2 is configured. If credentials are missing, Obsidian's default behaviour (local save) is preserved regardless of mode.
 
 ## <span id="roadmap"></span>🗺️ Roadmap
 
@@ -100,6 +124,8 @@ Open **Settings → EzImage** and fill in your Cloudflare R2 credentials:
 - [x] Automatic WebP compression
 - [x] Paste & drag-drop interception
 - [x] Flexible path templates
+- [x] Local Save mode with status bar toggle
+- [x] Language support (EN / 中文)
 - [ ] AWS S3 / generic S3-compatible providers
 - [ ] Aliyun OSS & Tencent COS
 - [ ] GitHub / Gitee image hosting mode

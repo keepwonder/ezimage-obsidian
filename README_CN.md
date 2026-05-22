@@ -3,10 +3,10 @@
 <div align="center">
   <img src="https://images.flashnote.top/2026/02/icon.png" width="128" alt="EzImage Logo" />
   <h1>EzImage for Obsidian</h1>
-  <p><b>粘贴或拖拽图片 — 自动上传到云端并插入 Markdown 链接，本地不保存任何文件</b></p>
+  <p><b>粘贴或拖拽图片 — 自动上传到云端并插入 Markdown 链接</b></p>
 
   <p>
-    <img src="https://img.shields.io/badge/版本-1.0.0-blue.svg" alt="Version" />
+    <img src="https://img.shields.io/badge/版本-1.0.2-blue.svg" alt="Version" />
     <img src="https://img.shields.io/badge/平台-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
     <img src="https://img.shields.io/badge/Obsidian-%3E%3D0.15.0-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/许可证-MIT-orange.svg" alt="License" />
@@ -28,16 +28,18 @@
 
 ---
 
-**EzImage for Obsidian** 解决了 Obsidian 图片管理的核心痛点：默认情况下，粘贴的图片会以本地文件的形式保存在 vault 中，久而久之导致文件夹混乱。EzImage 拦截每一次粘贴和拖拽事件，将图片上传到你的云存储，并在光标处插入简洁的 Markdown 链接 — 让你的 vault 彻底告别二进制文件。
+**EzImage for Obsidian** 解决了 Obsidian 图片管理的核心痛点：默认情况下，粘贴的图片会以本地文件的形式保存在 vault 中，久而久之导致文件夹混乱。EzImage 拦截每一次粘贴和拖拽事件，将图片上传到你的云存储，并在光标处插入简洁的 Markdown 链接。需要本地保存时，点击状态栏一键切换模式即可。
 
 ## <span id="features"></span>✨ 功能特性
 
 - **🖼️ 无感粘贴拦截** — 在笔记中粘贴图片，EzImage 在 Obsidian 本地保存之前拦截事件，上传图片并自动插入 `![image](url)`。
 - **🖱️ 拖拽上传** — 直接从 Finder / 文件管理器将图片拖入编辑器，自动上传。
+- **💾 本地保存模式** — 点击状态栏的 ☁️ 图标切换到 💾 本地保存模式，此时粘贴和拖拽均走 Obsidian 默认行为，图片保存到 vault 本地。再次点击恢复上传模式。
 - **📉 自动 WebP 压缩** — 基于 `browser-image-compression`，上传前自动转为 WebP 并按需缩放，在不损失可见质量的前提下大幅压缩体积。
 - **📂 灵活路径模板** — 通过变量完全控制上传路径：`{yyyy}` `{MM}` `{dd}` `{timestamp}` `{random}` `{name}` `{ext}`。
 - **☁️ Cloudflare R2** — 零出口流量费，S3 兼容 API，全球 CDN。更多云存储提供商即将支持。
 - **🔒 本地签名** — AWS Signature V4 完全在设备端通过 Web Crypto API 计算，你的密钥永不离开本机。
+- **🌐 中英文界面** — 设置页面支持中文 / 英文 / 跟随系统，随时切换。
 
 ## <span id="install"></span>📦 安装
 
@@ -71,6 +73,13 @@
 3. 复制 **Account ID**、**Access Key ID** 和 **Secret Access Key**。
 4. 确保存储桶已启用**公开访问**（或通过自定义域名 + Worker 提供访问）。
 
+### 通用设置
+
+| 选项 | 默认值 | 说明 |
+| :--- | :--- | :--- |
+| **默认本地保存模式** | `关闭` | 开启后插件启动时默认进入本地保存模式 |
+| **语言** | `跟随系统` | 设置页面语言：跟随系统 / English / 中文 |
+
 ### 图片处理选项
 
 | 选项 | 默认值 | 说明 |
@@ -88,9 +97,17 @@
 | :--- | :--- |
 | **粘贴图片** | 复制任意图片 → 在编辑器中粘贴，自动触发上传 |
 | **拖拽上传** | 从文件管理器拖拽图片文件到编辑器 |
+| **切换模式** | 点击状态栏 ☁️ / 💾 图标，或命令面板 → `EzImage: Toggle Local Save Mode` |
 | **从文件上传** | 命令面板 → `EzImage: Upload Image from File` |
 | **上传剪贴板** | 命令面板 → `EzImage: Upload Clipboard Image` |
 | **右键菜单** | 在编辑器中右键 → EzImage 选项 |
+
+### 状态栏说明
+
+| 图标 | 模式 | 行为 |
+| :--- | :--- | :--- |
+| ☁️ EzImage | 上传模式（默认）| 粘贴 / 拖拽 → 上传到 R2，插入 `![image](url)` |
+| 💾 Local Save | 本地保存模式 | 粘贴 / 拖拽 → 保存到 vault，插入 `![[filename]]` |
 
 > **注意：** 只有在 R2 配置完成后，EzImage 才会拦截事件。未配置时，Obsidian 的默认行为（本地保存）不受影响。
 
@@ -100,6 +117,8 @@
 - [x] 自动 WebP 压缩
 - [x] 粘贴 & 拖拽拦截
 - [x] 灵活路径模板
+- [x] 本地保存模式切换
+- [x] 中英文界面
 - [ ] AWS S3 / 通用 S3 兼容协议
 - [ ] 阿里云 OSS & 腾讯云 COS
 - [ ] GitHub / Gitee 图床模式
