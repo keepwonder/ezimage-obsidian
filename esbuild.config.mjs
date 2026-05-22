@@ -30,7 +30,10 @@ const context = await esbuild.context({
     "@lezer/common",
     "@lezer/highlight",
     "@lezer/lr",
+    // Node.js built-ins — available in Electron renderer via nodeIntegration
     ...builtins,
+    // Also exclude the "node:" prefixed versions used by @smithy/node-http-handler
+    ...builtins.map((m) => `node:${m}`),
   ],
   format: "cjs",
   target: "es2020",
