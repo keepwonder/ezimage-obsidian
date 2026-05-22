@@ -36,4 +36,4 @@ jobs:
           gh release create "$tag" \
             --title "$tag" \
             --notes "$notes" \
-            main.js manifest.json versions.json
+            main.js manifest.json
