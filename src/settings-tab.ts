@@ -133,6 +133,16 @@ export class EzImageSettingsTab extends PluginSettingTab {
         })
       );
 
+    new Setting(containerEl)
+      .setName(t('stripExif'))
+      .setDesc(t('stripExifDesc'))
+      .addToggle(toggle =>
+        toggle.setValue(this.plugin.settings.stripExif).onChange(async value => {
+          this.plugin.settings.stripExif = value;
+          await this.plugin.saveSettings();
+        })
+      );
+
     // Max width with validation
     const maxWidthErrEl = containerEl.createEl('p', { cls: 'setting-item-description' });
     maxWidthErrEl.style.color = 'var(--color-red)';

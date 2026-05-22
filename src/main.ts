@@ -236,6 +236,7 @@ export default class EzImagePlugin extends Plugin {
       let uploadName = fileName;
 
       if (this.settings.compress) {
+        // browser-image-compression converts to WebP, which naturally drops EXIF
         try {
           const file = new File([data], fileName, { type: mimeType });
           const compressed = await imageCompression(file, {
@@ -250,6 +251,14 @@ export default class EzImagePlugin extends Plugin {
         } catch (e) {
           console.warn('EzImage: compression failed, uploading original', e);
         }
+      } else if (this.settings.stripExif) {
+        // Compression is off but user wants EXIF stripped — redraw via Canvas
+        try {
+          const stripped = await this.stripExifFromImage(data, mimeType);
+          uploadData = stripped;
+        } catch (e) {
+          console.warn('EzImage: EXIF strip failed, uploading original', e);
+        }
       }
 
       const targetKey = generateFilePath(uploadName, this.settings.pathTemplate);
@@ -263,6 +272,47 @@ export default class EzImagePlugin extends Plugin {
       new Notice(this.formatUploadError(e));
       console.error('EzImage upload error:', e);
     }
+  }
+
+  /**
+   * Strip EXIF metadata by redrawing the image onto a Canvas and exporting it.
+   * Works for JPEG, PNG, WebP. The output retains pixel data but drops all metadata.
+   */
+  private stripExifFromImage(data: ArrayBuffer, mimeType: string): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([data], { type: mimeType });
+      const url  = URL.createObjectURL(blob);
+      const img  = new Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width  = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { resolve(data); return; } // fallback: return original
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(
+            outputBlob => {
+              if (!outputBlob) { resolve(data); return; }
+              outputBlob.arrayBuffer().then(resolve).catch(() => resolve(data));
+            },
+            mimeType,
+            1.0  // quality = lossless for PNG; ignored for formats that don't support it
+          );
+        } catch (e) {
+          reject(e);
+        }
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to load image for EXIF stripping'));
+      };
+
+      img.src = url;
+    });
   }
 
   /**

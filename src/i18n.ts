@@ -65,6 +65,10 @@ interface Translations {
   errMaxWidth: string;
   errMaxFileSizeMB: string;
   pathTemplatePreviewLabel: string;
+
+  // EXIF
+  stripExif: string;
+  stripExifDesc: string;
 }
 
 const en: Translations = {
@@ -110,6 +114,9 @@ const en: Translations = {
   errMaxWidth:          '⚠ Must be a number ≥ 0',
   errMaxFileSizeMB:     '⚠ Must be a number ≥ 0',
   pathTemplatePreviewLabel: 'Preview: ',
+
+  stripExif:     'Strip EXIF Metadata',
+  stripExifDesc: 'Remove GPS, device info, and other metadata before uploading. Only applies when compression is disabled — compression already strips EXIF by converting to WebP.',
 };
 
 const zh: Translations = {
@@ -155,6 +162,9 @@ const zh: Translations = {
   errMaxWidth:          '⚠ 请输入 ≥ 0 的数字',
   errMaxFileSizeMB:     '⚠ 请输入 ≥ 0 的数字',
   pathTemplatePreviewLabel: '预览：',
+
+  stripExif:     '清除 EXIF 元数据',
+  stripExifDesc: '上传前移除 GPS 位置、设备信息等元数据，保护隐私。仅在关闭压缩时生效——开启压缩时转换为 WebP 已自动清除 EXIF。',
 };
 
 const locales = { en, zh };

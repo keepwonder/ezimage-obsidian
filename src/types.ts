@@ -31,6 +31,7 @@ export interface EzImageSettings {
   maxWidth: number;
   quality: number;
   maxFileSizeMB: number;   // 0 = no limit
+  stripExif: boolean;      // strip EXIF when compression is disabled
   localSaveByDefault: boolean;
   language: AppLanguage;
 }
@@ -49,6 +50,7 @@ export const DEFAULT_SETTINGS: EzImageSettings = {
   maxWidth: 1920,
   quality: 85,
   maxFileSizeMB: 20,
+  stripExif: true,
   localSaveByDefault: false,
   language: 'auto',
 };
