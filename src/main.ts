@@ -32,7 +32,7 @@ export default class EzImagePlugin extends Plugin {
 
     this.addCommand({
       id: 'upload-clipboard',
-      name: 'Upload Clipboard Image',
+      name: t('cmdUploadClipboard'),
       editorCallback: async (editor: Editor) => {
         await this.handleClipboardUpload(editor);
       },
@@ -40,7 +40,7 @@ export default class EzImagePlugin extends Plugin {
 
     this.addCommand({
       id: 'upload-file',
-      name: 'Upload Image from File',
+      name: t('cmdUploadFile'),
       editorCallback: async (editor: Editor) => {
         await this.handleFileUpload(editor);
       },
@@ -48,16 +48,16 @@ export default class EzImagePlugin extends Plugin {
 
     this.addCommand({
       id: 'toggle-local-mode',
-      name: 'Toggle Local Save Mode',
+      name: t('cmdToggleLocalMode'),
       callback: () => {
         this.setLocalMode(!this.settings.localSaveByDefault);
-        new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
+        new Notice(this.settings.localSaveByDefault ? t('noticeLocalModeOn') : t('noticeLocalModeOff'));
       },
     });
 
     this.addCommand({
       id: 'batch-upload',
-      name: 'Batch Upload Local Images',
+      name: t('cmdBatchUpload'),
       callback: () => {
         new BatchUploadModal(this.app, this).open();
       },
@@ -70,29 +70,29 @@ export default class EzImagePlugin extends Plugin {
         menu.addSeparator();
         menu.addItem(item =>
           item
-            .setTitle('EzImage: Upload Clipboard Image')
+            .setTitle(`${t('menuEzImage')}: ${t('menuUploadClipboard')}`)
             .setIcon('clipboard')
             .onClick(() => this.handleClipboardUpload(editor))
         );
         menu.addItem(item =>
           item
-            .setTitle('EzImage: Upload Image from File')
+            .setTitle(`${t('menuEzImage')}: ${t('menuUploadFile')}`)
             .setIcon('folder-open')
             .onClick(() => this.handleFileUpload(editor))
         );
         menu.addItem(item =>
           item
-            .setTitle('EzImage: Batch Upload Local Images')
+            .setTitle(`${t('menuEzImage')}: ${t('menuBatchUpload')}`)
             .setIcon('upload-cloud')
             .onClick(() => new BatchUploadModal(this.app, this).open())
         );
         menu.addItem(item =>
           item
-            .setTitle('EzImage: Toggle Local Save Mode')
+            .setTitle(`${t('menuEzImage')}: ${t('menuToggleLocalMode')}`)
             .setIcon('switch')
             .onClick(() => {
               this.setLocalMode(!this.settings.localSaveByDefault);
-              new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
+              new Notice(this.settings.localSaveByDefault ? t('noticeLocalModeOn') : t('noticeLocalModeOff'));
             })
         );
         menu.addSeparator();
@@ -104,7 +104,7 @@ export default class EzImagePlugin extends Plugin {
       this.app.workspace.on('file-menu', (menu, file) => {
         menu.addItem(item =>
           item
-            .setTitle('EzImage: Batch Upload Local Images')
+            .setTitle(`${t('menuEzImage')}: ${t('menuBatchUpload')}`)
             .setIcon('upload-cloud')
             .onClick(() => {
               console.log('File menu clicked, file path:', file.path);

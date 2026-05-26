@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import type EzImagePlugin from './main';
 import type { AppLanguage } from './types';
 import { t, setLocale } from './i18n';
@@ -241,10 +241,15 @@ export class EzImageSettingsTab extends PluginSettingTab {
           .addOption('zh',   t('langZh'))
           .setValue(this.plugin.settings.language)
           .onChange(async value => {
+            const oldLang = this.plugin.settings.language;
             this.plugin.settings.language = value as AppLanguage;
             await this.plugin.saveSettings();
             setLocale(this.plugin.settings.language);
             this.display();
+            // Notify user to reload plugin for command palette to update
+            if (oldLang !== value) {
+              new Notice(t('noticeLanguageChanged'));
+            }
           })
       );
   }

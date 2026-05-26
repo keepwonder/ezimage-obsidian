@@ -69,6 +69,24 @@ interface Translations {
   // EXIF
   stripExif: string;
   stripExifDesc: string;
+
+  // Commands
+  cmdUploadClipboard: string;
+  cmdUploadFile: string;
+  cmdBatchUpload: string;
+  cmdToggleLocalMode: string;
+
+  // Context menu
+  menuEzImage: string;
+  menuUploadClipboard: string;
+  menuUploadFile: string;
+  menuBatchUpload: string;
+  menuToggleLocalMode: string;
+
+  // Notices
+  noticeLocalModeOn: string;
+  noticeLocalModeOff: string;
+  noticeLanguageChanged: string;
 }
 
 const en: Translations = {
@@ -117,6 +135,21 @@ const en: Translations = {
 
   stripExif:     'Strip EXIF Metadata',
   stripExifDesc: 'Remove GPS, device info, and other metadata before uploading. Only applies when compression is disabled — compression already strips EXIF by converting to WebP.',
+
+  cmdUploadClipboard: 'Upload Clipboard Image',
+  cmdUploadFile: 'Upload Image from File',
+  cmdBatchUpload: 'Batch Upload Local Images',
+  cmdToggleLocalMode: 'Toggle Local Save Mode',
+
+  menuEzImage: 'EzImage',
+  menuUploadClipboard: 'Upload Clipboard Image',
+  menuUploadFile: 'Upload Image from File',
+  menuBatchUpload: 'Batch Upload Local Images',
+  menuToggleLocalMode: 'Toggle Local Save Mode',
+
+  noticeLocalModeOn: 'EzImage: Local Save mode ON',
+  noticeLocalModeOff: 'EzImage: Upload mode ON',
+  noticeLanguageChanged: 'EzImage: Language changed. Please reload the plugin for commands to update.',
 };
 
 const zh: Translations = {
@@ -165,6 +198,21 @@ const zh: Translations = {
 
   stripExif:     '清除 EXIF 元数据',
   stripExifDesc: '上传前移除 GPS 位置、设备信息等元数据，保护隐私。仅在关闭压缩时生效——开启压缩时转换为 WebP 已自动清除 EXIF。',
+
+  cmdUploadClipboard: '上传剪贴板图片',
+  cmdUploadFile: '从文件上传图片',
+  cmdBatchUpload: '批量上传本地图片',
+  cmdToggleLocalMode: '切换本地保存模式',
+
+  menuEzImage: 'EzImage',
+  menuUploadClipboard: '上传剪贴板图片',
+  menuUploadFile: '从文件上传图片',
+  menuBatchUpload: '批量上传本地图片',
+  menuToggleLocalMode: '切换本地保存模式',
+
+  noticeLocalModeOn: 'EzImage：本地保存模式已开启',
+  noticeLocalModeOff: 'EzImage：上传模式已开启',
+  noticeLanguageChanged: 'EzImage：语言已更改，请重新加载插件以更新命令面板。',
 };
 
 const locales = { en, zh };
