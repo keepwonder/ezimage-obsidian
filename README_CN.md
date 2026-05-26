@@ -104,6 +104,7 @@
 | **切换模式** | 设置页面 toggle，或命令面板 → `EzImage: Toggle Local Save Mode` |
 | **从文件上传** | 命令面板 → `EzImage: Upload Image from File` |
 | **上传剪贴板** | 命令面板 → `EzImage: Upload Clipboard Image` |
+| **批量上传本地图片** | 命令面板 → `EzImage: Batch Upload Local Images` — 扫描 vault 中的 `![[image.*]]` 引用并批量上传到云端 |
 | **右键菜单** | 在编辑器中右键 → EzImage 选项 |
 
 ### 状态栏说明
@@ -130,6 +131,7 @@
 - [x] 文件大小限制与输入校验
 - [x] 网络错误自动重试
 - [x] EXIF 元数据清除（关闭压缩时）
+- [x] 批量上传 vault 中已有的本地图片
 - [ ] AWS S3 / 通用 S3 兼容协议
 - [ ] 阿里云 OSS & 腾讯云 COS
 - [ ] GitHub / Gitee 图床模式

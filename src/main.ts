@@ -7,6 +7,10 @@ import { EzImageSettingsTab } from './settings-tab';
 import { generateFilePath, replaceExtension } from './utils';
 import { getClipboardImage } from './handlers/clipboard';
 import { setLocale, t } from './i18n';
+import { BatchUploadModal } from './modals/batch-upload-modal';
+
+// Import styles
+import './styles.css';
 
 export default class EzImagePlugin extends Plugin {
   settings: EzImageSettings;
@@ -48,6 +52,14 @@ export default class EzImagePlugin extends Plugin {
       callback: () => {
         this.setLocalMode(!this.settings.localSaveByDefault);
         new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
+      },
+    });
+
+    this.addCommand({
+      id: 'batch-upload',
+      name: 'Batch Upload Local Images',
+      callback: () => {
+        new BatchUploadModal(this.app, this).open();
       },
     });
 
@@ -214,57 +226,68 @@ export default class EzImagePlugin extends Plugin {
 
   // ── Core Upload Logic ──────────────────────────────────────────────────────
 
+  /**
+   * Public upload method for batch upload modal.
+   * Returns the uploaded image URL.
+   */
+  async uploadImage(
+    data: ArrayBuffer,
+    fileName: string,
+    mimeType: string
+  ): Promise<string> {
+    // File size guard (before compression)
+    const limitMB = this.settings.maxFileSizeMB;
+    if (limitMB > 0 && data.byteLength > limitMB * 1024 * 1024) {
+      const sizeMB = (data.byteLength / 1024 / 1024).toFixed(1);
+      throw new Error(`File too large (${sizeMB} MB). Limit is ${limitMB} MB.`);
+    }
+
+    let uploadData = data;
+    let uploadMime = mimeType;
+    let uploadName = fileName;
+
+    if (this.settings.compress) {
+      // browser-image-compression converts to WebP, which naturally drops EXIF
+      try {
+        const file = new File([data], fileName, { type: mimeType });
+        const compressed = await imageCompression(file, {
+          maxWidthOrHeight: this.settings.maxWidth || undefined,
+          initialQuality: this.settings.quality / 100,
+          useWebWorker: true,
+          fileType: 'image/webp',
+        });
+        uploadData = await compressed.arrayBuffer();
+        uploadMime = 'image/webp';
+        uploadName = replaceExtension(fileName, 'webp');
+      } catch (e) {
+        console.warn('EzImage: compression failed, uploading original', e);
+      }
+    } else if (this.settings.stripExif) {
+      // Compression is off but user wants EXIF stripped — redraw via Canvas
+      try {
+        const stripped = await this.stripExifFromImage(data, mimeType);
+        uploadData = stripped;
+      } catch (e) {
+        console.warn('EzImage: EXIF strip failed, uploading original', e);
+      }
+    }
+
+    const targetKey = generateFilePath(uploadName, this.settings.pathTemplate);
+    const result = await this.uploadWithRetry({ data: uploadData, fileName: targetKey, mimeType: uploadMime });
+    return result.url;
+  }
+
   async uploadAndInsert(
     editor: Editor,
     data: ArrayBuffer,
     fileName: string,
     mimeType: string
   ) {
-    // File size guard (before compression)
-    const limitMB = this.settings.maxFileSizeMB;
-    if (limitMB > 0 && data.byteLength > limitMB * 1024 * 1024) {
-      const sizeMB = (data.byteLength / 1024 / 1024).toFixed(1);
-      new Notice(`EzImage: File too large (${sizeMB} MB). Limit is ${limitMB} MB — adjust in Settings.`);
-      return;
-    }
-
     const notice = new Notice('EzImage: Uploading…', 0);
 
     try {
-      let uploadData = data;
-      let uploadMime = mimeType;
-      let uploadName = fileName;
-
-      if (this.settings.compress) {
-        // browser-image-compression converts to WebP, which naturally drops EXIF
-        try {
-          const file = new File([data], fileName, { type: mimeType });
-          const compressed = await imageCompression(file, {
-            maxWidthOrHeight: this.settings.maxWidth || undefined,
-            initialQuality: this.settings.quality / 100,
-            useWebWorker: true,
-            fileType: 'image/webp',
-          });
-          uploadData = await compressed.arrayBuffer();
-          uploadMime = 'image/webp';
-          uploadName = replaceExtension(fileName, 'webp');
-        } catch (e) {
-          console.warn('EzImage: compression failed, uploading original', e);
-        }
-      } else if (this.settings.stripExif) {
-        // Compression is off but user wants EXIF stripped — redraw via Canvas
-        try {
-          const stripped = await this.stripExifFromImage(data, mimeType);
-          uploadData = stripped;
-        } catch (e) {
-          console.warn('EzImage: EXIF strip failed, uploading original', e);
-        }
-      }
-
-      const targetKey = generateFilePath(uploadName, this.settings.pathTemplate);
-      const result = await this.uploadWithRetry({ data: uploadData, fileName: targetKey, mimeType: uploadMime });
-
-      editor.replaceSelection(`![image](${result.url})`);
+      const url = await this.uploadImage(data, fileName, mimeType);
+      editor.replaceSelection(`![image](${url})`);
       notice.hide();
       new Notice('EzImage: Upload successful ✓');
     } catch (e: unknown) {

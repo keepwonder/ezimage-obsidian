@@ -106,6 +106,7 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 | **Drag & drop** | Drag image file(s) from your file manager into the editor |
 | **Upload from file** | Command Palette → `EzImage: Upload Image from File` |
 | **Upload clipboard** | Command Palette → `EzImage: Upload Clipboard Image` |
+| **Batch upload local images** | Command Palette → `EzImage: Batch Upload Local Images` — scan vault for `![[image.*]]` wikilinks and batch upload to cloud |
 | **Toggle mode** | Settings toggle, or Command Palette → `EzImage: Toggle Local Save Mode` |
 | **Context menu** | Right-click in editor → EzImage options |
 
@@ -133,6 +134,7 @@ To switch modes, use the **Settings toggle** or **Command Palette → `EzImage: 
 - [x] File size limit & input validation
 - [x] Auto-retry on network errors
 - [x] EXIF metadata stripping (when compression is off)
+- [x] Batch upload existing local images in vault
 - [ ] AWS S3 / generic S3-compatible providers
 - [ ] Aliyun OSS & Tencent COS
 - [ ] GitHub / Gitee image hosting mode
