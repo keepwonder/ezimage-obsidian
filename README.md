@@ -106,7 +106,7 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 | **Drag & drop** | Drag image file(s) from your file manager into the editor |
 | **Upload from file** | Command Palette → `EzImage: Upload Image from File` |
 | **Upload clipboard** | Command Palette → `EzImage: Upload Clipboard Image` |
-| **Batch upload local images** | Command Palette → `EzImage: Batch Upload Local Images` — scan vault for `![[image.*]]` wikilinks and batch upload to cloud |
+| **Batch upload local images** | Command Palette → `EzImage: Batch Upload Local Images` (entire vault)<br>Right-click on file/folder → `EzImage: Batch Upload Local Images` (scoped) |
 | **Toggle mode** | Settings toggle, or Command Palette → `EzImage: Toggle Local Save Mode` |
 | **Context menu** | Right-click in editor → EzImage options |
 

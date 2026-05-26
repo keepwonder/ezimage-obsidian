@@ -104,7 +104,7 @@
 | **切换模式** | 设置页面 toggle，或命令面板 → `EzImage: Toggle Local Save Mode` |
 | **从文件上传** | 命令面板 → `EzImage: Upload Image from File` |
 | **上传剪贴板** | 命令面板 → `EzImage: Upload Clipboard Image` |
-| **批量上传本地图片** | 命令面板 → `EzImage: Batch Upload Local Images` — 扫描 vault 中的 `![[image.*]]` 引用并批量上传到云端 |
+| **批量上传本地图片** | 命令面板 → `EzImage: Batch Upload Local Images` (整个 vault)<br>右键文件/文件夹 → `EzImage: Batch Upload Local Images` (指定范围) |
 | **右键菜单** | 在编辑器中右键 → EzImage 选项 |
 
 ### 状态栏说明

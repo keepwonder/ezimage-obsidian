@@ -64,7 +64,7 @@ export default class EzImagePlugin extends Plugin {
     });
 
     // ── Context menu ──────────────────────────────────────────────────────────
-
+    // Editor context menu (right-click in editor)
     this.registerEvent(
       this.app.workspace.on('editor-menu', (menu, editor) => {
         menu.addItem(item =>
@@ -93,6 +93,18 @@ export default class EzImagePlugin extends Plugin {
               this.setLocalMode(!this.settings.localSaveByDefault);
               new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
             })
+        );
+      })
+    );
+
+    // File explorer context menu (right-click on files/folders)
+    this.registerEvent(
+      this.app.workspace.on('file-menu', (menu, file) => {
+        menu.addItem(item =>
+          item
+            .setTitle('EzImage: Batch Upload Local Images')
+            .setIcon('upload-cloud')
+            .onClick(() => new BatchUploadModal(this.app, this, file.path).open())
         );
       })
     );

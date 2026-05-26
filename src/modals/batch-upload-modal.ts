@@ -1,4 +1,4 @@
-import { App, Modal, Notice, TFile } from 'obsidian';
+import { App, Modal, Notice, TFile, TFolder } from 'obsidian';
 import EzImagePlugin from '../main';
 
 interface LocalImage {
@@ -16,10 +16,12 @@ export class BatchUploadModal extends Modal {
   private plugin: EzImagePlugin;
   private images: LocalImage[] = [];
   private deleteAfterUpload = false;
+  private scopePath: string | null;
 
-  constructor(app: App, plugin: EzImagePlugin) {
+  constructor(app: App, plugin: EzImagePlugin, scopePath: string | null = null) {
     super(app);
     this.plugin = plugin;
+    this.scopePath = scopePath;
   }
 
   async onOpen() {
@@ -27,14 +29,17 @@ export class BatchUploadModal extends Modal {
     contentEl.empty();
     contentEl.addClass('ezimage-batch-modal');
 
-    // Title
-    contentEl.createEl('h2', { text: '批量上传本地图片' });
+    // Title with scope info
+    const scopeText = this.scopePath
+      ? `批量上传本地图片 (${this.scopePath})`
+      : '批量上传本地图片 (整个 Vault)';
+    contentEl.createEl('h2', { text: scopeText });
 
     // Scanning notice
     const scanNotice = contentEl.createDiv({ cls: 'ezimage-scan-notice' });
-    scanNotice.createSpan({ text: '🔍 正在扫描 vault...' });
+    scanNotice.createSpan({ text: '🔍 正在扫描...' });
 
-    // Scan vault
+    // Scan vault or specific scope
     await this.scanVault();
 
     scanNotice.remove();
@@ -91,9 +96,37 @@ export class BatchUploadModal extends Modal {
 
   /** Scan all markdown files in vault for ![[image.*]] wikilinks */
   private async scanVault(): Promise<void> {
-    const mdFiles = this.app.vault.getMarkdownFiles();
     const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'];
     const wikilinkRegex = /!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|bmp|svg))\]\]/gi;
+
+    // Get markdown files based on scope
+    let mdFiles: TFile[];
+    if (this.scopePath) {
+      const scopeFile = this.app.vault.getAbstractFileByPath(this.scopePath);
+      if (scopeFile instanceof TFile) {
+        // Single file
+        mdFiles = [scopeFile];
+      } else if (scopeFile instanceof TFolder) {
+        // Folder - get all markdown files recursively
+        mdFiles = [];
+        const collectFiles = (folder: TFolder) => {
+          for (const child of folder.children) {
+            if (child instanceof TFile && child.extension === 'md') {
+              mdFiles.push(child);
+            } else if (child instanceof TFolder) {
+              collectFiles(child);
+            }
+          }
+        };
+        collectFiles(scopeFile);
+      } else {
+        // Invalid path
+        return;
+      }
+    } else {
+      // Entire vault
+      mdFiles = this.app.vault.getMarkdownFiles();
+    }
 
     for (const mdFile of mdFiles) {
       const content = await this.app.vault.read(mdFile);

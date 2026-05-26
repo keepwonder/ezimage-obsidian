@@ -9,11 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Batch Upload Local Images**: New command `EzImage: Batch Upload Local Images` to scan vault for existing `![[image.*]]` wikilinks and batch upload them to cloud storage
+- **Scoped Batch Upload**: Right-click on any file or folder in file explorer to batch upload images within that scope only
 - Interactive modal with scan results preview showing file count, total size, and per-file status
 - Progress tracking with real-time log during batch upload
 - Optional local file deletion after successful upload
 - Concurrent upload limit (3 simultaneous uploads) to prevent overwhelming R2 rate limits
 - Automatic wikilink replacement: `![[image.png]]` → `![image](url)` after upload
+- File explorer context menu integration for scoped batch uploads
+- All commands now accessible from both command palette and context menus
 
 ## [1.0.4] - 2026-05-22
 
