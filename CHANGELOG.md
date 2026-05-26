@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-05-26
+
+### Added
+- **Full i18n Support**: All commands, context menus, and notices now follow the language setting
+- Language change notification prompting user to reload plugin for command palette updates
+- Debug logging for batch upload scope path to diagnose issues
+
+### Changed
+- Context menu items now display in selected language (Chinese/English)
+- Command palette commands now display in selected language (requires plugin reload)
+- Improved context menu visual grouping with separators
+
+### Fixed
+- Context menu UX improvements for better visual organization
+
 ## [1.1.1] - 2026-05-26
 
 ### Added
