@@ -96,6 +96,8 @@ export class BatchUploadModal extends Modal {
 
   /** Scan all markdown files in vault for ![[image.*]] wikilinks */
   private async scanVault(): Promise<void> {
+    console.log('BatchUploadModal: scanVault called with scopePath:', this.scopePath);
+
     const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'];
     const wikilinkRegex = /!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|bmp|svg))\]\]/gi;
 
@@ -103,11 +105,15 @@ export class BatchUploadModal extends Modal {
     let mdFiles: TFile[];
     if (this.scopePath) {
       const scopeFile = this.app.vault.getAbstractFileByPath(this.scopePath);
+      console.log('BatchUploadModal: scopeFile type:', scopeFile?.constructor.name);
+
       if (scopeFile instanceof TFile) {
         // Single file
+        console.log('BatchUploadModal: Single file mode:', scopeFile.path);
         mdFiles = [scopeFile];
       } else if (scopeFile instanceof TFolder) {
         // Folder - get all markdown files recursively
+        console.log('BatchUploadModal: Folder mode:', scopeFile.path);
         mdFiles = [];
         const collectFiles = (folder: TFolder) => {
           for (const child of folder.children) {
@@ -119,14 +125,19 @@ export class BatchUploadModal extends Modal {
           }
         };
         collectFiles(scopeFile);
+        console.log('BatchUploadModal: Found', mdFiles.length, 'markdown files in folder');
       } else {
         // Invalid path
+        console.warn('BatchUploadModal: Invalid scope path:', this.scopePath);
         return;
       }
     } else {
       // Entire vault
+      console.log('BatchUploadModal: Entire vault mode');
       mdFiles = this.app.vault.getMarkdownFiles();
     }
+
+    console.log('BatchUploadModal: Scanning', mdFiles.length, 'markdown files');
 
     for (const mdFile of mdFiles) {
       const content = await this.app.vault.read(mdFile);

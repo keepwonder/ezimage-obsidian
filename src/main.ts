@@ -67,10 +67,11 @@ export default class EzImagePlugin extends Plugin {
     // Editor context menu (right-click in editor)
     this.registerEvent(
       this.app.workspace.on('editor-menu', (menu, editor) => {
+        menu.addSeparator();
         menu.addItem(item =>
           item
             .setTitle('EzImage: Upload Clipboard Image')
-            .setIcon('image')
+            .setIcon('clipboard')
             .onClick(() => this.handleClipboardUpload(editor))
         );
         menu.addItem(item =>
@@ -94,6 +95,7 @@ export default class EzImagePlugin extends Plugin {
               new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
             })
         );
+        menu.addSeparator();
       })
     );
 
@@ -104,7 +106,10 @@ export default class EzImagePlugin extends Plugin {
           item
             .setTitle('EzImage: Batch Upload Local Images')
             .setIcon('upload-cloud')
-            .onClick(() => new BatchUploadModal(this.app, this, file.path).open())
+            .onClick(() => {
+              console.log('File menu clicked, file path:', file.path);
+              new BatchUploadModal(this.app, this, file.path).open();
+            })
         );
       })
     );
