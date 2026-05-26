@@ -66,7 +66,7 @@ export default class EzImagePlugin extends Plugin {
     // ── Context menu ──────────────────────────────────────────────────────────
     // Editor context menu (right-click in editor)
     this.registerEvent(
-      this.app.workspace.on('editor-menu', (menu, editor) => {
+      this.app.workspace.on('editor-menu', (menu, editor, view) => {
         menu.addSeparator();
         menu.addItem(item =>
           item
@@ -84,7 +84,11 @@ export default class EzImagePlugin extends Plugin {
           item
             .setTitle(`${t('menuEzImage')}: ${t('menuBatchUpload')}`)
             .setIcon('upload-cloud')
-            .onClick(() => new BatchUploadModal(this.app, this).open())
+            .onClick(() => {
+              // Get current file from view
+              const file = view.file;
+              new BatchUploadModal(this.app, this, file?.path ?? null).open();
+            })
         );
         menu.addItem(item =>
           item
@@ -106,10 +110,7 @@ export default class EzImagePlugin extends Plugin {
           item
             .setTitle(`${t('menuEzImage')}: ${t('menuBatchUpload')}`)
             .setIcon('upload-cloud')
-            .onClick(() => {
-              console.log('File menu clicked, file path:', file.path);
-              new BatchUploadModal(this.app, this, file.path).open();
-            })
+            .onClick(() => new BatchUploadModal(this.app, this, file.path).open())
         );
       })
     );
