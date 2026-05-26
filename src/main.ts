@@ -79,6 +79,21 @@ export default class EzImagePlugin extends Plugin {
             .setIcon('folder-open')
             .onClick(() => this.handleFileUpload(editor))
         );
+        menu.addItem(item =>
+          item
+            .setTitle('EzImage: Batch Upload Local Images')
+            .setIcon('upload-cloud')
+            .onClick(() => new BatchUploadModal(this.app, this).open())
+        );
+        menu.addItem(item =>
+          item
+            .setTitle('EzImage: Toggle Local Save Mode')
+            .setIcon('switch')
+            .onClick(() => {
+              this.setLocalMode(!this.settings.localSaveByDefault);
+              new Notice(`EzImage: ${this.settings.localSaveByDefault ? 'Local Save mode ON' : 'Upload mode ON'}`);
+            })
+        );
       })
     );
 
