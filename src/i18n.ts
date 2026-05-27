@@ -87,6 +87,28 @@ interface Translations {
   noticeLocalModeOn: string;
   noticeLocalModeOff: string;
   noticeLanguageChanged: string;
+
+  // Batch upload modal
+  batchTitleScope: string;
+  batchTitleVault: string;
+  batchScanning: string;
+  batchEmpty: string;
+  batchClose: string;
+  batchStats: string;
+  batchMissingFile: string;
+  batchLocatedAt: string;
+  batchDeleteAfterUpload: string;
+  batchStartUpload: string;
+  batchCancel: string;
+  batchProgressTitle: string;
+  batchProgressText: string;
+  batchNoValidImages: string;
+  batchMarkdownChanged: string;
+  batchUploading: string;
+  batchSuccess: string;
+  batchFailure: string;
+  batchDone: string;
+  batchNoticeDone: string;
 }
 
 const en: Translations = {
@@ -150,6 +172,27 @@ const en: Translations = {
   noticeLocalModeOn: 'EzImage: Local Save mode ON',
   noticeLocalModeOff: 'EzImage: Upload mode ON',
   noticeLanguageChanged: 'EzImage: Language changed. Please reload the plugin for commands to update.',
+
+  batchTitleScope: 'Batch Upload Local Images ({scope})',
+  batchTitleVault: 'Batch Upload Local Images (entire vault)',
+  batchScanning: 'Scanning...',
+  batchEmpty: 'No local image references found',
+  batchClose: 'Close',
+  batchStats: 'Found {count} local images, total size {size} MB',
+  batchMissingFile: 'file missing',
+  batchLocatedAt: 'Located in: {path}',
+  batchDeleteAfterUpload: ' Delete local files after successful upload',
+  batchStartUpload: 'Start Upload',
+  batchCancel: 'Cancel',
+  batchProgressTitle: 'Upload Progress',
+  batchProgressText: '{completed} / {total} (Success: {succeeded}, Failed: {failed})',
+  batchNoValidImages: 'All image files are missing; nothing can be uploaded',
+  batchMarkdownChanged: 'Markdown file changed while batch upload was running',
+  batchUploading: 'Uploading: {name}',
+  batchSuccess: 'Success: {name}',
+  batchFailure: 'Failed: {name} - {message}',
+  batchDone: 'Done. Success: {succeeded}, Failed: {failed}',
+  batchNoticeDone: 'EzImage: Batch upload complete ({succeeded} succeeded, {failed} failed)',
 };
 
 const zh: Translations = {
@@ -213,6 +256,27 @@ const zh: Translations = {
   noticeLocalModeOn: 'EzImage：本地保存模式已开启',
   noticeLocalModeOff: 'EzImage：上传模式已开启',
   noticeLanguageChanged: 'EzImage：语言已更改，请重新加载插件以更新命令面板。',
+
+  batchTitleScope: '批量上传本地图片 ({scope})',
+  batchTitleVault: '批量上传本地图片 (整个 Vault)',
+  batchScanning: '正在扫描...',
+  batchEmpty: '未发现本地图片引用',
+  batchClose: '关闭',
+  batchStats: '发现 {count} 张本地图片，总大小 {size} MB',
+  batchMissingFile: '文件不存在',
+  batchLocatedAt: '位于：{path}',
+  batchDeleteAfterUpload: ' 上传成功后删除本地文件',
+  batchStartUpload: '开始上传',
+  batchCancel: '取消',
+  batchProgressTitle: '上传进度',
+  batchProgressText: '{completed} / {total} (成功: {succeeded}, 失败: {failed})',
+  batchNoValidImages: '所有图片文件均不存在，无法上传',
+  batchMarkdownChanged: '批量上传过程中 Markdown 文件发生了变化',
+  batchUploading: '上传中：{name}',
+  batchSuccess: '成功：{name}',
+  batchFailure: '失败：{name} - {message}',
+  batchDone: '完成。成功：{succeeded}，失败：{failed}',
+  batchNoticeDone: 'EzImage：批量上传完成 ({succeeded} 成功，{failed} 失败)',
 };
 
 const locales = { en, zh };
@@ -220,4 +284,15 @@ const locales = { en, zh };
 /** Return the translation string for the current locale. */
 export function t<K extends keyof Translations>(key: K): string {
   return locales[getLocale()][key];
+}
+
+export function fmt<K extends keyof Translations>(
+  key: K,
+  values: Record<string, string | number>
+): string {
+  let text = t(key);
+  for (const [name, value] of Object.entries(values)) {
+    text = text.split(`{${name}}`).join(String(value));
+  }
+  return text;
 }

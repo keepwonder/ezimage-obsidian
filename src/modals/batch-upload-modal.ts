@@ -1,11 +1,17 @@
 import { App, Modal, Notice, TFile, TFolder } from 'obsidian';
 import EzImagePlugin from '../main';
+import { fmt, t } from '../i18n';
+import { getMimeType } from '../utils';
 
 interface LocalImage {
   /** The markdown file containing the wikilink */
   mdFile: TFile;
   /** The wikilink text, e.g., "![[image.png]]" */
   wikilink: string;
+  /** Start offset of this wikilink in the source markdown file */
+  start: number;
+  /** End offset of this wikilink in the source markdown file */
+  end: number;
   /** The referenced image file (if it exists in vault) */
   imageFile: TFile | null;
   /** File size in bytes (0 if file not found) */
@@ -31,13 +37,13 @@ export class BatchUploadModal extends Modal {
 
     // Title with scope info
     const scopeText = this.scopePath
-      ? `批量上传本地图片 (${this.scopePath})`
-      : '批量上传本地图片 (整个 Vault)';
+      ? fmt('batchTitleScope', { scope: this.scopePath })
+      : t('batchTitleVault');
     contentEl.createEl('h2', { text: scopeText });
 
     // Scanning notice
     const scanNotice = contentEl.createDiv({ cls: 'ezimage-scan-notice' });
-    scanNotice.createSpan({ text: '🔍 正在扫描...' });
+    scanNotice.createSpan({ text: t('batchScanning') });
 
     // Scan vault or specific scope
     await this.scanVault();
@@ -45,9 +51,9 @@ export class BatchUploadModal extends Modal {
     scanNotice.remove();
 
     if (this.images.length === 0) {
-      contentEl.createDiv({ text: '✓ 未发现本地图片引用', cls: 'ezimage-empty' });
+      contentEl.createDiv({ text: t('batchEmpty'), cls: 'ezimage-empty' });
       const btnContainer = contentEl.createDiv({ cls: 'ezimage-btn-container' });
-      btnContainer.createEl('button', { text: '关闭' }).onclick = () => this.close();
+      btnContainer.createEl('button', { text: t('batchClose') }).onclick = () => this.close();
       return;
     }
 
@@ -55,7 +61,7 @@ export class BatchUploadModal extends Modal {
     const stats = contentEl.createDiv({ cls: 'ezimage-stats' });
     const totalSize = this.images.reduce((sum, img) => sum + img.size, 0);
     const sizeMB = (totalSize / 1024 / 1024).toFixed(2);
-    stats.createEl('p', { text: `📊 发现 ${this.images.length} 张本地图片,总大小 ${sizeMB} MB` });
+    stats.createEl('p', { text: fmt('batchStats', { count: this.images.length, size: sizeMB }) });
 
     // Image list (scrollable)
     const listContainer = contentEl.createDiv({ cls: 'ezimage-list-container' });
@@ -63,13 +69,13 @@ export class BatchUploadModal extends Modal {
 
     for (const img of this.images) {
       const li = list.createEl('li');
-      const status = img.imageFile ? '✓' : '✗';
-      const sizeText = img.imageFile ? `(${(img.size / 1024).toFixed(1)} KB)` : '(文件不存在)';
+      const status = img.imageFile ? 'OK' : '!';
+      const sizeText = img.imageFile ? `(${(img.size / 1024).toFixed(1)} KB)` : `(${t('batchMissingFile')})`;
       li.createSpan({ text: `${status} `, cls: img.imageFile ? 'ezimage-ok' : 'ezimage-missing' });
       li.createSpan({ text: img.wikilink });
       li.createSpan({ text: ` ${sizeText}`, cls: 'ezimage-size' });
       li.createEl('br');
-      li.createSpan({ text: `   位于: ${img.mdFile.path}`, cls: 'ezimage-path' });
+      li.createSpan({ text: fmt('batchLocatedAt', { path: img.mdFile.path }), cls: 'ezimage-path' });
     }
 
     // Options
@@ -78,12 +84,12 @@ export class BatchUploadModal extends Modal {
     const checkbox = deleteCheckbox.createEl('input', { type: 'checkbox' });
     checkbox.checked = false;
     checkbox.onchange = () => { this.deleteAfterUpload = checkbox.checked; };
-    deleteCheckbox.createSpan({ text: ' 上传成功后删除本地文件' });
+    deleteCheckbox.createSpan({ text: t('batchDeleteAfterUpload') });
 
     // Buttons
     const btnContainer = contentEl.createDiv({ cls: 'ezimage-btn-container' });
-    const uploadBtn = btnContainer.createEl('button', { text: '开始上传', cls: 'mod-cta' });
-    const cancelBtn = btnContainer.createEl('button', { text: '取消' });
+    const uploadBtn = btnContainer.createEl('button', { text: t('batchStartUpload'), cls: 'mod-cta' });
+    const cancelBtn = btnContainer.createEl('button', { text: t('batchCancel') });
 
     uploadBtn.onclick = () => this.startUpload();
     cancelBtn.onclick = () => this.close();
@@ -96,7 +102,6 @@ export class BatchUploadModal extends Modal {
 
   /** Scan all markdown files in vault for ![[image.*]] wikilinks */
   private async scanVault(): Promise<void> {
-    const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp', 'svg'];
     const wikilinkRegex = /!\[\[([^\]]+\.(png|jpg|jpeg|gif|webp|bmp|svg))\]\]/gi;
 
     // Get markdown files based on scope
@@ -134,6 +139,8 @@ export class BatchUploadModal extends Modal {
       const matches = content.matchAll(wikilinkRegex);
 
       for (const match of matches) {
+        if (match.index === undefined) continue;
+
         const wikilink = match[0]; // e.g., "![[image.png]]"
         const imagePath = match[1]; // e.g., "image.png" or "folder/image.png"
 
@@ -143,6 +150,8 @@ export class BatchUploadModal extends Modal {
         this.images.push({
           mdFile,
           wikilink,
+          start: match.index,
+          end: match.index + wikilink.length,
           imageFile,
           size: imageFile?.stat.size ?? 0,
         });
@@ -155,11 +164,13 @@ export class BatchUploadModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
 
-    contentEl.createEl('h2', { text: '上传进度' });
+    contentEl.createEl('h2', { text: t('batchProgressTitle') });
+    const validImages = this.images.filter(img => img.imageFile !== null);
+    const uploadTotal = validImages.length;
 
     const progressDiv = contentEl.createDiv({ cls: 'ezimage-progress' });
-    const progressBar = progressDiv.createEl('progress', { attr: { max: this.images.length, value: 0 } });
-    const progressText = progressDiv.createDiv({ cls: 'ezimage-progress-text', text: '0 / ' + this.images.length });
+    const progressBar = progressDiv.createEl('progress', { attr: { max: uploadTotal, value: 0 } });
+    const progressText = progressDiv.createDiv({ cls: 'ezimage-progress-text', text: this.formatProgress(0, uploadTotal, 0, 0) });
 
     const logDiv = contentEl.createDiv({ cls: 'ezimage-log' });
 
@@ -169,7 +180,7 @@ export class BatchUploadModal extends Modal {
 
     const updateProgress = () => {
       progressBar.value = completed;
-      progressText.textContent = `${completed} / ${this.images.length} (成功: ${succeeded}, 失败: ${failed})`;
+      progressText.textContent = this.formatProgress(completed, uploadTotal, succeeded, failed);
     };
 
     const log = (msg: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -178,57 +189,138 @@ export class BatchUploadModal extends Modal {
       logDiv.scrollTop = logDiv.scrollHeight;
     };
 
-    // Filter out images with missing files
-    const validImages = this.images.filter(img => img.imageFile !== null);
     if (validImages.length === 0) {
-      log('所有图片文件均不存在,无法上传', 'error');
+      log(t('batchNoValidImages'), 'error');
       return;
     }
 
-    // Batch upload with concurrency limit
-    const tasks = validImages.map(img => async () => {
-      try {
-        const imageFile = img.imageFile!;
-        log(`⏳ 上传中: ${imageFile.name}`);
+    const uploadCache = new Map<string, Promise<string>>();
+    const getUploadedUrl = (imageFile: TFile): Promise<string> => {
+      const cached = uploadCache.get(imageFile.path);
+      if (cached) return cached;
 
-        // Read file data
+      const upload = (async () => {
+        log(fmt('batchUploading', { name: imageFile.name }));
         const data = await this.app.vault.readBinary(imageFile);
+        return this.plugin.uploadImage(data, imageFile.name, getMimeType(imageFile.extension));
+      })();
 
-        // Upload (reuse plugin's upload logic)
-        const url = await this.plugin.uploadImage(data, imageFile.name, this.getMimeType(imageFile.extension));
+      uploadCache.set(imageFile.path, upload);
+      return upload;
+    };
 
-        // Replace wikilink with markdown URL in the source file
-        const mdContent = await this.app.vault.read(img.mdFile);
-        const newContent = mdContent.replace(img.wikilink, `![image](${url})`);
-        await this.app.vault.modify(img.mdFile, newContent);
+    const groups = this.groupByMarkdownFile(validImages);
+    const successfulImagePaths = new Set<string>();
+    const failedImagePaths = new Set<string>();
 
-        // Optionally delete local file
-        if (this.deleteAfterUpload) {
-          await this.app.vault.delete(imageFile);
+    // Process each markdown file as one write to avoid concurrent modification races.
+    const tasks = groups.map(group => async () => {
+      const replacements: { start: number; end: number; expected: string; text: string }[] = [];
+      const touchedImagePaths = new Set<string>();
+      try {
+        for (const img of group.images) {
+          const imageFile = img.imageFile!;
+          touchedImagePaths.add(imageFile.path);
+          const url = await getUploadedUrl(imageFile);
+          replacements.push({
+            start: img.start,
+            end: img.end,
+            expected: img.wikilink,
+            text: `![image](${url})`,
+          });
         }
 
-        log(`✓ 成功: ${imageFile.name}`, 'success');
-        succeeded++;
+        const mdContent = await this.app.vault.read(group.mdFile);
+        await this.app.vault.modify(group.mdFile, this.applyReplacements(mdContent, replacements));
+
+        for (const img of group.images) {
+          const imageFile = img.imageFile!;
+          successfulImagePaths.add(imageFile.path);
+          log(fmt('batchSuccess', { name: imageFile.name }), 'success');
+        }
+        succeeded += group.images.length;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
-        log(`✗ 失败: ${img.imageFile?.name} — ${msg}`, 'error');
-        failed++;
+        for (const img of group.images) {
+          const name = img.imageFile?.name ?? img.wikilink;
+          if (img.imageFile) failedImagePaths.add(img.imageFile.path);
+          log(fmt('batchFailure', { name, message: msg }), 'error');
+        }
+        for (const imagePath of touchedImagePaths) failedImagePaths.add(imagePath);
+        failed += group.images.length;
       } finally {
-        completed++;
+        completed += group.images.length;
         updateProgress();
       }
     });
 
     await this.runWithConcurrency(tasks, 3);
 
-    log(`\n🎉 完成! 成功: ${succeeded}, 失败: ${failed}`, succeeded > 0 ? 'success' : 'error');
+    if (this.deleteAfterUpload) {
+      await this.deleteUploadedFiles(successfulImagePaths, failedImagePaths, log);
+    }
+
+    log(fmt('batchDone', { succeeded, failed }), succeeded > 0 ? 'success' : 'error');
 
     // Done button
     const btnContainer = contentEl.createDiv({ cls: 'ezimage-btn-container' });
-    btnContainer.createEl('button', { text: '关闭', cls: 'mod-cta' }).onclick = () => {
+    btnContainer.createEl('button', { text: t('batchClose'), cls: 'mod-cta' }).onclick = () => {
       this.close();
-      new Notice(`EzImage: 批量上传完成 (${succeeded} 成功, ${failed} 失败)`);
+      new Notice(fmt('batchNoticeDone', { succeeded, failed }));
     };
+  }
+
+  private formatProgress(completed: number, total: number, succeeded: number, failed: number): string {
+    return fmt('batchProgressText', { completed, total, succeeded, failed });
+  }
+
+  private groupByMarkdownFile(images: LocalImage[]): { mdFile: TFile; images: LocalImage[] }[] {
+    const groups = new Map<string, { mdFile: TFile; images: LocalImage[] }>();
+    for (const image of images) {
+      let group = groups.get(image.mdFile.path);
+      if (!group) {
+        group = { mdFile: image.mdFile, images: [] };
+        groups.set(image.mdFile.path, group);
+      }
+      group.images.push(image);
+    }
+    return Array.from(groups.values());
+  }
+
+  private applyReplacements(
+    content: string,
+    replacements: { start: number; end: number; expected: string; text: string }[]
+  ): string {
+    for (const replacement of replacements) {
+      if (content.slice(replacement.start, replacement.end) !== replacement.expected) {
+        throw new Error(t('batchMarkdownChanged'));
+      }
+    }
+
+    return [...replacements]
+      .sort((a, b) => b.start - a.start)
+      .reduce((next, replacement) =>
+        next.slice(0, replacement.start) + replacement.text + next.slice(replacement.end),
+      content);
+  }
+
+  private async deleteUploadedFiles(
+    successfulImagePaths: Set<string>,
+    failedImagePaths: Set<string>,
+    log: (msg: string, type?: 'info' | 'success' | 'error') => void
+  ): Promise<void> {
+    for (const imagePath of successfulImagePaths) {
+      if (failedImagePaths.has(imagePath)) continue;
+      const file = this.app.vault.getAbstractFileByPath(imagePath);
+      if (file instanceof TFile) {
+        try {
+          await this.app.vault.delete(file);
+        } catch (e: unknown) {
+          const msg = e instanceof Error ? e.message : String(e);
+          log(fmt('batchFailure', { name: file.name, message: msg }), 'error');
+        }
+      }
+    }
   }
 
   /** Run tasks with concurrency limit (same pattern as main.ts) */
@@ -243,17 +335,4 @@ export class BatchUploadModal extends Modal {
     await Promise.all(workers);
   }
 
-  /** Get MIME type from file extension */
-  private getMimeType(ext: string): string {
-    const map: Record<string, string> = {
-      png: 'image/png',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      gif: 'image/gif',
-      webp: 'image/webp',
-      bmp: 'image/bmp',
-      svg: 'image/svg+xml',
-    };
-    return map[ext.toLowerCase()] || 'image/png';
-  }
 }

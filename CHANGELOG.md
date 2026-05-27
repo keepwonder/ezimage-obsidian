@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-05-27
+
+### Fixed
+- Batch upload now uses localized UI text consistently in English and Chinese
+- Batch upload now updates each Markdown file in a single write to avoid duplicate-link and concurrent-write replacement issues
+- Batch upload now verifies source wikilink positions before modifying notes, preventing stale replacements if a note changes mid-upload
+- Uploaded path template file names are sanitized before generating public object keys
+
+### Changed
+- Clarified plugin metadata to state current Cloudflare R2 support
+
 ## [1.1.3] - 2026-05-26
 
 ### Fixed

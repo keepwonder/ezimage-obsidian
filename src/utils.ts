@@ -4,6 +4,20 @@ export function generateRandom(length = 8): string {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 
+export function sanitizePathSegment(value: string, fallback = 'image'): string {
+  const sanitized = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\\/<>:"|?*#%&{}[\]\x00-\x1f]/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^\.+/, '')
+    .replace(/[.-]+$/, '')
+    .slice(0, 120);
+
+  return sanitized || fallback;
+}
+
 /**
  * Render a path template with date/time and file variables.
  * Supports: {yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}
@@ -11,8 +25,8 @@ export function generateRandom(length = 8): string {
 export function generateFilePath(originalName: string, template: string): string {
   const now = new Date();
   const dotIndex = originalName.lastIndexOf('.');
-  const ext = dotIndex !== -1 ? originalName.slice(dotIndex + 1) : 'png';
-  const name = dotIndex !== -1 ? originalName.slice(0, dotIndex) : originalName;
+  const ext = sanitizePathSegment(dotIndex !== -1 ? originalName.slice(dotIndex + 1) : 'png', 'png').toLowerCase();
+  const name = sanitizePathSegment(dotIndex !== -1 ? originalName.slice(0, dotIndex) : originalName);
 
   const variables: Record<string, string> = {
     '{timestamp}': Date.now().toString(),
@@ -42,6 +56,7 @@ export function getMimeType(ext: string): string {
     jpeg: 'image/jpeg',
     gif: 'image/gif',
     webp: 'image/webp',
+    bmp: 'image/bmp',
     svg: 'image/svg+xml',
   };
   return map[ext.toLowerCase()] ?? 'image/png';
