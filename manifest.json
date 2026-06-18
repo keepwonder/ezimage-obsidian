@@ -1,7 +1,7 @@
 {
   "id": "ezimage",
   "name": "EzImage",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "minAppVersion": "0.15.0",
   "description": "Upload images to Cloudflare R2 with automatic compression. Paste or drag images to get a Markdown link instantly.",
   "author": "Kiang",
