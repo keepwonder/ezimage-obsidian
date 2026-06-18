@@ -83,7 +83,7 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 | Option | Default | Description |
 | :--- | :--- | :--- |
 | **Compress Images** | `on` | Convert to WebP before upload — also strips EXIF automatically |
-| **Formats to Keep Original** | `gif` | Extensions that bypass conversion, resizing, and metadata stripping. Separate multiple values with spaces or commas |
+| **Formats to Keep Original** | `gif` | Extensions that bypass conversion, resizing, and metadata stripping. Animated GIF, WebP, PNG, AVIF, and SVG files are also detected from their contents and preserved automatically |
 | **Strip EXIF Metadata** | `on` | Remove GPS, device info, and other metadata. Only applies when compression is off (compression already strips EXIF via WebP conversion) |
 | **Max Width** | `1920` | Resize if wider than this (px). `0` = no limit |
 | **Quality** | `85` | WebP quality (1–100) |

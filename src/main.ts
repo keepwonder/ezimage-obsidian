@@ -8,6 +8,7 @@ import {
   generateFilePath,
   isImageProcessingExcluded,
   normalizeExtensionList,
+  reconcileImageMetadata,
   replaceExtension,
 } from './utils';
 import { getClipboardImage } from './handlers/clipboard';
@@ -280,19 +281,20 @@ export default class EzImagePlugin extends Plugin {
       throw new Error(`File too large (${sizeMB} MB). Limit is ${limitMB} MB.`);
     }
 
+    const inspected = reconcileImageMetadata(data, fileName, mimeType);
     let uploadData = data;
-    let uploadMime = mimeType;
-    let uploadName = fileName;
+    let uploadMime = inspected.resolvedMimeType;
+    let uploadName = inspected.fileName;
     const processingExcluded = isImageProcessingExcluded(
-      fileName,
-      mimeType,
+      uploadName,
+      uploadMime,
       this.settings.compressionExcludedExtensions
-    );
+    ) || inspected.animated;
 
     if (this.settings.compress && !processingExcluded) {
       // browser-image-compression converts to WebP, which naturally drops EXIF
       try {
-        const file = new File([data], fileName, { type: mimeType });
+        const file = new File([data], uploadName, { type: uploadMime });
         const compressed = await imageCompression(file, {
           maxWidthOrHeight: this.settings.maxWidth || undefined,
           initialQuality: this.settings.quality / 100,
@@ -301,14 +303,14 @@ export default class EzImagePlugin extends Plugin {
         });
         uploadData = await compressed.arrayBuffer();
         uploadMime = 'image/webp';
-        uploadName = replaceExtension(fileName, 'webp');
+        uploadName = replaceExtension(uploadName, 'webp');
       } catch (e) {
         console.warn('EzImage: compression failed, uploading original', e);
       }
     } else if (!processingExcluded && this.settings.stripExif) {
       // Compression is off but user wants EXIF stripped — redraw via Canvas
       try {
-        const stripped = await this.stripExifFromImage(data, mimeType);
+        const stripped = await this.stripExifFromImage(data, uploadMime);
         uploadData = stripped;
       } catch (e) {
         console.warn('EzImage: EXIF strip failed, uploading original', e);

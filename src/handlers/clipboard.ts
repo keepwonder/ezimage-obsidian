@@ -44,6 +44,28 @@ export async function getClipboardImage(): Promise<ClipboardImage | null> {
     const electron = require('electron');
     const clipboard = electron.clipboard ?? electron.remote?.clipboard;
     if (clipboard) {
+      // Prefer original encoded clipboard data so animated GIF/WebP/APNG/AVIF
+      // is not flattened by nativeImage.toPNG(). Clipboard format names vary
+      // between operating systems, so match both MIME names and platform UTIs.
+      const formats: string[] = clipboard.availableFormats?.() ?? [];
+      const encodedFormats = [
+        { pattern: /gif/i, extension: 'gif', mimeType: 'image/gif' },
+        { pattern: /webp/i, extension: 'webp', mimeType: 'image/webp' },
+        { pattern: /avif/i, extension: 'avif', mimeType: 'image/avif' },
+        { pattern: /png/i, extension: 'png', mimeType: 'image/png' },
+      ];
+      for (const candidate of encodedFormats) {
+        const format = formats.find(value => candidate.pattern.test(value));
+        if (!format || typeof clipboard.readBuffer !== 'function') continue;
+        const buffer: Buffer = clipboard.readBuffer(format);
+        if (buffer.length === 0) continue;
+        return {
+          data: buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength),
+          fileName: `clipboard-${Date.now()}.${candidate.extension}`,
+          mimeType: candidate.mimeType,
+        };
+      }
+
       const image = clipboard.readImage();
       if (!image.isEmpty()) {
         const buffer: Buffer = image.toPNG();
