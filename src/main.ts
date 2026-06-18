@@ -4,7 +4,12 @@ import imageCompression from 'browser-image-compression';
 import { DEFAULT_SETTINGS, EzImageSettings } from './types';
 import { R2Uploader } from './uploaders/r2';
 import { EzImageSettingsTab } from './settings-tab';
-import { generateFilePath, replaceExtension } from './utils';
+import {
+  generateFilePath,
+  isImageProcessingExcluded,
+  normalizeExtensionList,
+  replaceExtension,
+} from './utils';
 import { getClipboardImage } from './handlers/clipboard';
 import { setLocale, t } from './i18n';
 import { BatchUploadModal } from './modals/batch-upload-modal';
@@ -278,8 +283,13 @@ export default class EzImagePlugin extends Plugin {
     let uploadData = data;
     let uploadMime = mimeType;
     let uploadName = fileName;
+    const processingExcluded = isImageProcessingExcluded(
+      fileName,
+      mimeType,
+      this.settings.compressionExcludedExtensions
+    );
 
-    if (this.settings.compress) {
+    if (this.settings.compress && !processingExcluded) {
       // browser-image-compression converts to WebP, which naturally drops EXIF
       try {
         const file = new File([data], fileName, { type: mimeType });
@@ -295,7 +305,7 @@ export default class EzImagePlugin extends Plugin {
       } catch (e) {
         console.warn('EzImage: compression failed, uploading original', e);
       }
-    } else if (this.settings.stripExif) {
+    } else if (!processingExcluded && this.settings.stripExif) {
       // Compression is off but user wants EXIF stripped — redraw via Canvas
       try {
         const stripped = await this.stripExifFromImage(data, mimeType);
@@ -517,6 +527,9 @@ export default class EzImagePlugin extends Plugin {
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    this.settings.compressionExcludedExtensions = normalizeExtensionList(
+      this.settings.compressionExcludedExtensions ?? DEFAULT_SETTINGS.compressionExcludedExtensions
+    );
   }
 
   async saveSettings() {

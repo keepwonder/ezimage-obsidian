@@ -2,7 +2,7 @@ import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import type EzImagePlugin from './main';
 import type { AppLanguage } from './types';
 import { t, setLocale } from './i18n';
-import { generateFilePath } from './utils';
+import { generateFilePath, normalizeExtensionList } from './utils';
 
 export class EzImageSettingsTab extends PluginSettingTab {
   plugin: EzImagePlugin;
@@ -132,6 +132,21 @@ export class EzImageSettingsTab extends PluginSettingTab {
           await this.plugin.saveSettings();
         })
       );
+
+    new Setting(containerEl)
+      .setName(t('compressionExcludedExtensions'))
+      .setDesc(t('compressionExcludedExtensionsDesc'))
+      .addText(text => {
+        text
+          .setPlaceholder('gif webp svg')
+          .setValue(this.plugin.settings.compressionExcludedExtensions.join(' '))
+          .onChange(async value => {
+            this.plugin.settings.compressionExcludedExtensions = normalizeExtensionList(value);
+            await this.plugin.saveSettings();
+          });
+        text.inputEl.style.width = '180px';
+        return text;
+      });
 
     new Setting(containerEl)
       .setName(t('stripExif'))

@@ -62,6 +62,48 @@ export function getMimeType(ext: string): string {
   return map[ext.toLowerCase()] ?? 'image/png';
 }
 
+/**
+ * Parse a user-entered list of file extensions.
+ * Accepts whitespace, commas, and semicolons; stores lowercase extensions
+ * without a leading dot.
+ */
+export function normalizeExtensionList(value: string | string[]): string[] {
+  const input = Array.isArray(value) ? value.join(' ') : value;
+  return Array.from(new Set(
+    input
+      .split(/[\s,;]+/)
+      .map(ext => ext.trim().toLowerCase().replace(/^\.+/, ''))
+      .filter(Boolean)
+  ));
+}
+
+/** Return whether an image should bypass all lossy image processing. */
+export function isImageProcessingExcluded(
+  fileName: string,
+  mimeType: string,
+  excludedExtensions: string[]
+): boolean {
+  const excluded = new Set(normalizeExtensionList(excludedExtensions));
+  if (excluded.size === 0) return false;
+
+  const dot = fileName.lastIndexOf('.');
+  const fileExtension = dot >= 0 ? fileName.slice(dot + 1).toLowerCase() : '';
+  const mimeExtension = mimeType
+    .toLowerCase()
+    .replace(/^image\//, '')
+    .replace(/\+xml$/, '');
+
+  // Treat the common JPEG extensions as aliases.
+  if (
+    (fileExtension === 'jpg' || fileExtension === 'jpeg' || mimeExtension === 'jpeg') &&
+    (excluded.has('jpg') || excluded.has('jpeg'))
+  ) {
+    return true;
+  }
+
+  return excluded.has(fileExtension) || excluded.has(mimeExtension);
+}
+
 /** Replace or append an extension on a filename */
 export function replaceExtension(fileName: string, newExt: string): string {
   const dot = fileName.lastIndexOf('.');

@@ -40,6 +40,8 @@ interface Translations {
   pathTemplateDesc: string;
   compress: string;
   compressDesc: string;
+  compressionExcludedExtensions: string;
+  compressionExcludedExtensionsDesc: string;
   maxWidth: string;
   maxWidthDesc: string;
   quality: string;
@@ -132,6 +134,8 @@ const en: Translations = {
   pathTemplateDesc:  'Template for the uploaded file path. Variables: {yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}',
   compress:          'Compress Images',
   compressDesc:      'Convert images to WebP and reduce file size before uploading',
+  compressionExcludedExtensions:     'Formats to Keep Original',
+  compressionExcludedExtensionsDesc: 'Upload these formats without conversion, resizing, or metadata stripping. Separate extensions with spaces or commas. GIF is excluded by default to preserve animation.',
   maxWidth:          'Max Width (px)',
   maxWidthDesc:      'Images wider than this will be resized. 0 = no limit.',
   quality:           'Quality',
@@ -216,6 +220,8 @@ const zh: Translations = {
   pathTemplateDesc:  '上传文件的路径模板，可用变量：{yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}',
   compress:          '压缩图片',
   compressDesc:      '上传前将图片转换为 WebP 格式并压缩体积',
+  compressionExcludedExtensions:     '保持原格式',
+  compressionExcludedExtensionsDesc: '这些格式将原样上传，不转码、缩放或清除元数据。多个扩展名用空格或逗号分隔。默认排除 GIF 以保留动画。',
   maxWidth:          '最大宽度（px）',
   maxWidthDesc:      '超过此宽度的图片将自动缩放，0 表示不限制',
   quality:           '压缩质量',

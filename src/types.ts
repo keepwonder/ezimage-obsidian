@@ -28,6 +28,7 @@ export interface EzImageSettings {
   r2: R2Config;
   pathTemplate: string;
   compress: boolean;
+  compressionExcludedExtensions: string[];
   maxWidth: number;
   quality: number;
   maxFileSizeMB: number;   // 0 = no limit
@@ -47,6 +48,7 @@ export const DEFAULT_SETTINGS: EzImageSettings = {
   },
   pathTemplate: '{yyyy}/{MM}/{timestamp}-{random}.{ext}',
   compress: true,
+  compressionExcludedExtensions: ['gif'],
   maxWidth: 1920,
   quality: 85,
   maxFileSizeMB: 20,

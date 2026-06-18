@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Configurable list of image formats that should be uploaded unchanged, with support for space-, comma-, or semicolon-separated extensions
+- English and Chinese settings copy and documentation for original-format exclusions
+
+### Fixed
+- GIF files now bypass WebP conversion by default, preserving all animation frames across paste, drag-and-drop, file picker, and batch upload flows
+- Excluded formats retain their original bytes, file extension, and MIME type without resizing or Canvas metadata stripping
+
 ## [1.1.4] - 2026-05-27
 
 ### Fixed
