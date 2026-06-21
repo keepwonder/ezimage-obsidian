@@ -8,7 +8,7 @@
   <p>
     <img src="https://img.shields.io/github/manifest-json/v/keepwonder/ezimage-obsidian?color=blue&label=%E7%89%88%E6%9C%AC" alt="Version" />
     <img src="https://img.shields.io/badge/平台-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
-    <img src="https://img.shields.io/badge/Obsidian-%3E%3D1.13.0-purple.svg" alt="Obsidian" />
+    <img src="https://img.shields.io/badge/Obsidian-%3E%3D1.8.7-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/许可证-MIT-orange.svg" alt="License" />
   </p>
 
