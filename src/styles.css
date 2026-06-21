@@ -5,6 +5,41 @@
   max-width: 600px;
 }
 
+.ezimage-template-preview {
+  margin-top: -8px;
+  margin-bottom: 8px;
+  font-family: var(--font-monospace);
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.ezimage-input-wide {
+  width: 180px;
+}
+
+.ezimage-input-narrow {
+  width: 80px;
+}
+
+.ezimage-validation-error {
+  display: none;
+  color: var(--text-error);
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.ezimage-file-input {
+  display: none;
+}
+
+.ezimage-status-local {
+  opacity: 1;
+}
+
+.ezimage-status-upload {
+  opacity: 0.5;
+}
+
 .ezimage-batch-modal h2 {
   margin-top: 0;
   margin-bottom: 16px;

@@ -40,8 +40,8 @@ export async function getClipboardImage(): Promise<ClipboardImage | null> {
 
   // --- Strategy 2: Electron clipboard (Desktop only) ---
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const electron = require('electron');
+    // Dynamic import keeps the desktop-only module out of the mobile load path.
+    const electron = await import('electron');
     const clipboard = electron.clipboard ?? electron.remote?.clipboard;
     if (clipboard) {
       // Prefer original encoded clipboard data so animated GIF/WebP/APNG/AVIF

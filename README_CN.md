@@ -8,7 +8,7 @@
   <p>
     <img src="https://img.shields.io/github/manifest-json/v/keepwonder/ezimage-obsidian?color=blue&label=%E7%89%88%E6%9C%AC" alt="Version" />
     <img src="https://img.shields.io/badge/平台-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
-    <img src="https://img.shields.io/badge/Obsidian-%3E%3D0.15.0-purple.svg" alt="Obsidian" />
+    <img src="https://img.shields.io/badge/Obsidian-%3E%3D1.8.7-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/许可证-MIT-orange.svg" alt="License" />
   </p>
 
@@ -52,7 +52,7 @@
 
 ### 方式 B：手动安装
 
-1. 从 [GitHub Releases](https://github.com/keepwonder/ezimage-obsidian/releases) 下载 `main.js` 和 `manifest.json`。
+1. 从 [GitHub Releases](https://github.com/keepwonder/ezimage-obsidian/releases) 下载 `main.js`、`main.css` 和 `manifest.json`。
 2. 将两个文件复制到 `<你的vault>/.obsidian/plugins/ezimage/` 目录下。
 3. 重启 Obsidian，在**设置 → 第三方插件**中启用插件。
 
@@ -156,7 +156,7 @@ npm run dev
 npm run build
 ```
 
-将生成的 `main.js` 和 `manifest.json` 复制到 vault 的插件目录中即可本地测试。
+将生成的 `main.js`、`main.css` 和 `manifest.json` 复制到 vault 的插件目录中即可本地测试。
 
 ---
 

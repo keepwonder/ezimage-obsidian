@@ -1,4 +1,4 @@
-import { App, Modal, Notice, TFile, TFolder } from 'obsidian';
+import { App, Modal, Notice, Setting, TFile, TFolder } from 'obsidian';
 import EzImagePlugin from '../main';
 import { fmt, t } from '../i18n';
 import { getMimeType } from '../utils';
@@ -39,7 +39,7 @@ export class BatchUploadModal extends Modal {
     const scopeText = this.scopePath
       ? fmt('batchTitleScope', { scope: this.scopePath })
       : t('batchTitleVault');
-    contentEl.createEl('h2', { text: scopeText });
+    new Setting(contentEl).setName(scopeText).setHeading();
 
     // Scanning notice
     const scanNotice = contentEl.createDiv({ cls: 'ezimage-scan-notice' });
@@ -91,7 +91,7 @@ export class BatchUploadModal extends Modal {
     const uploadBtn = btnContainer.createEl('button', { text: t('batchStartUpload'), cls: 'mod-cta' });
     const cancelBtn = btnContainer.createEl('button', { text: t('batchCancel') });
 
-    uploadBtn.onclick = () => this.startUpload();
+    uploadBtn.onclick = () => { void this.startUpload(); };
     cancelBtn.onclick = () => this.close();
   }
 
@@ -164,7 +164,7 @@ export class BatchUploadModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
 
-    contentEl.createEl('h2', { text: t('batchProgressTitle') });
+    new Setting(contentEl).setName(t('batchProgressTitle')).setHeading();
     const validImages = this.images.filter(img => img.imageFile !== null);
     const uploadTotal = validImages.length;
 
@@ -314,7 +314,7 @@ export class BatchUploadModal extends Modal {
       const file = this.app.vault.getAbstractFileByPath(imagePath);
       if (file instanceof TFile) {
         try {
-          await this.app.vault.delete(file);
+          await this.app.fileManager.trashFile(file);
         } catch (e: unknown) {
           const msg = e instanceof Error ? e.message : String(e);
           log(fmt('batchFailure', { name: file.name, message: msg }), 'error');

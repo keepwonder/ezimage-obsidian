@@ -17,14 +17,14 @@ export class EzImageSettingsTab extends PluginSettingTab {
     containerEl.empty();
 
     // ── Header ──────────────────────────────────────────────────────────────
-    containerEl.createEl('h2', { text: t('settingsTitle') });
+    new Setting(containerEl).setName(t('settingsTitle')).setHeading();
     containerEl.createEl('p', {
       text: t('settingsDesc'),
       cls: 'setting-item-description',
     });
 
     // ── Cloudflare R2 ────────────────────────────────────────────────────────
-    containerEl.createEl('h3', { text: t('sectionR2') });
+    new Setting(containerEl).setName(t('sectionR2')).setHeading();
 
     new Setting(containerEl)
       .setName(t('accountId'))
@@ -94,18 +94,13 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     // ── Image Processing ─────────────────────────────────────────────────────
-    containerEl.createEl('h3', { text: t('sectionProcessing') });
+    new Setting(containerEl).setName(t('sectionProcessing')).setHeading();
 
     // Path template with live preview
     const templatePreviewEl = containerEl.createEl('p', {
-      cls: 'setting-item-description',
+      cls: ['setting-item-description', 'ezimage-template-preview'],
       text: t('pathTemplatePreviewLabel') + generateFilePath('example.png', this.plugin.settings.pathTemplate),
     });
-    templatePreviewEl.style.marginTop = '-8px';
-    templatePreviewEl.style.marginBottom = '8px';
-    templatePreviewEl.style.fontFamily = 'monospace';
-    templatePreviewEl.style.fontSize = '0.85em';
-    templatePreviewEl.style.opacity = '0.7';
 
     new Setting(containerEl)
       .setName(t('pathTemplate'))
@@ -144,7 +139,7 @@ export class EzImageSettingsTab extends PluginSettingTab {
             this.plugin.settings.compressionExcludedExtensions = normalizeExtensionList(value);
             await this.plugin.saveSettings();
           });
-        text.inputEl.style.width = '180px';
+        text.inputEl.addClass('ezimage-input-wide');
         return text;
       });
 
@@ -159,11 +154,9 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     // Max width with validation
-    const maxWidthErrEl = containerEl.createEl('p', { cls: 'setting-item-description' });
-    maxWidthErrEl.style.color = 'var(--color-red)';
-    maxWidthErrEl.style.marginTop = '-8px';
-    maxWidthErrEl.style.marginBottom = '8px';
-    maxWidthErrEl.style.display = 'none';
+    const maxWidthErrEl = containerEl.createEl('p', {
+      cls: ['setting-item-description', 'ezimage-validation-error'],
+    });
 
     new Setting(containerEl)
       .setName(t('maxWidth'))
@@ -176,14 +169,14 @@ export class EzImageSettingsTab extends PluginSettingTab {
             const num = parseInt(value, 10);
             if (isNaN(num) || num < 0) {
               maxWidthErrEl.textContent = t('errMaxWidth');
-              maxWidthErrEl.style.display = 'block';
+              maxWidthErrEl.show();
             } else {
-              maxWidthErrEl.style.display = 'none';
+              maxWidthErrEl.hide();
               this.plugin.settings.maxWidth = num;
               await this.plugin.saveSettings();
             }
           });
-        text.inputEl.style.width = '80px';
+        text.inputEl.addClass('ezimage-input-narrow');
         return text;
       });
 
@@ -202,11 +195,9 @@ export class EzImageSettingsTab extends PluginSettingTab {
       );
 
     // Max file size with validation
-    const maxSizeErrEl = containerEl.createEl('p', { cls: 'setting-item-description' });
-    maxSizeErrEl.style.color = 'var(--color-red)';
-    maxSizeErrEl.style.marginTop = '-8px';
-    maxSizeErrEl.style.marginBottom = '8px';
-    maxSizeErrEl.style.display = 'none';
+    const maxSizeErrEl = containerEl.createEl('p', {
+      cls: ['setting-item-description', 'ezimage-validation-error'],
+    });
 
     new Setting(containerEl)
       .setName(t('maxFileSizeMB'))
@@ -219,19 +210,19 @@ export class EzImageSettingsTab extends PluginSettingTab {
             const num = parseInt(value, 10);
             if (isNaN(num) || num < 0) {
               maxSizeErrEl.textContent = t('errMaxFileSizeMB');
-              maxSizeErrEl.style.display = 'block';
+              maxSizeErrEl.show();
             } else {
-              maxSizeErrEl.style.display = 'none';
+              maxSizeErrEl.hide();
               this.plugin.settings.maxFileSizeMB = num;
               await this.plugin.saveSettings();
             }
           });
-        text.inputEl.style.width = '80px';
+        text.inputEl.addClass('ezimage-input-narrow');
         return text;
       });
 
     // ── General ───────────────────────────────────────────────────────────────
-    containerEl.createEl('h3', { text: t('sectionGeneral') });
+    new Setting(containerEl).setName(t('sectionGeneral')).setHeading();
 
     new Setting(containerEl)
       .setName(t('localSaveDefault'))

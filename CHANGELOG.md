@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2026-06-21
+
+### Fixed
+- Resolve automated Obsidian review risks by replacing inline styles with CSS classes and native heading settings
+- Use public Obsidian APIs for language detection, active documents, and file trash behavior
+- Load Electron dynamically so the desktop clipboard fallback remains safe on mobile
+- Declare Obsidian 1.8.7 as the minimum supported version to match the APIs used by the plugin
+- Ship `main.css` as a separate release asset instead of importing styles into the JavaScript bundle
+
 ## [1.1.6] - 2026-06-18
 
 ### Fixed

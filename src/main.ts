@@ -15,9 +15,6 @@ import { getClipboardImage } from './handlers/clipboard';
 import { setLocale, t } from './i18n';
 import { BatchUploadModal } from './modals/batch-upload-modal';
 
-// Import styles
-import './styles.css';
-
 export default class EzImagePlugin extends Plugin {
   settings: EzImageSettings;
 
@@ -78,13 +75,13 @@ export default class EzImagePlugin extends Plugin {
           item
             .setTitle(`${t('menuEzImage')}: ${t('menuUploadClipboard')}`)
             .setIcon('clipboard')
-            .onClick(() => this.handleClipboardUpload(editor))
+            .onClick(() => { void this.handleClipboardUpload(editor); })
         );
         menu.addItem(item =>
           item
             .setTitle(`${t('menuEzImage')}: ${t('menuUploadFile')}`)
             .setIcon('folder-open')
-            .onClick(() => this.handleFileUpload(editor))
+            .onClick(() => { void this.handleFileUpload(editor); })
         );
         menu.addItem(item =>
           item
@@ -132,7 +129,7 @@ export default class EzImagePlugin extends Plugin {
     // In local-save mode: return early → Obsidian's handler saves to the vault.
     // In upload mode: block default, upload to R2.
 
-    this.registerDomEvent(document, 'paste', (evt: ClipboardEvent) => {
+    this.registerDomEvent(window.activeDocument, 'paste', (evt: ClipboardEvent) => {
       if (!this.isConfigured()) return;
       if (this.settings.localSaveByDefault) return; // let Obsidian save to vault
 
@@ -155,7 +152,7 @@ export default class EzImagePlugin extends Plugin {
       const view = this.app.workspace.getActiveViewOfType(MarkdownView);
       if (!view) return;
 
-      (async () => {
+      void (async () => {
         await this.runWithConcurrency(
           imageItems
             .map(imageItem => async () => {
@@ -173,7 +170,7 @@ export default class EzImagePlugin extends Plugin {
     // Always intercept image drops. Route to vault-save or R2-upload based on mode.
     // (Obsidian's native drop handler would reference the original file path, not copy it.)
 
-    this.registerDomEvent(document, 'drop', (evt: DragEvent) => {
+    this.registerDomEvent(window.activeDocument, 'drop', (evt: DragEvent) => {
       if (!this.isConfigured()) return;
 
       const target = evt.target as Element;
@@ -195,7 +192,7 @@ export default class EzImagePlugin extends Plugin {
       const view = this.app.workspace.getActiveViewOfType(MarkdownView);
       if (!view) return;
 
-      (async () => {
+      void (async () => {
         await this.runWithConcurrency(
           imageFiles.map(file => async () => {
             if (this.settings.localSaveByDefault) {
@@ -245,15 +242,15 @@ export default class EzImagePlugin extends Plugin {
       return;
     }
 
-    const input = document.createElement('input');
+    const input = window.activeDocument.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
-    input.style.display = 'none';
-    document.body.appendChild(input);
+    input.addClass('ezimage-file-input');
+    window.activeDocument.body.appendChild(input);
 
     input.onchange = async () => {
-      document.body.removeChild(input);
+      input.remove();
       if (!input.files) return;
       for (const file of Array.from(input.files)) {
         const data = await file.arrayBuffer();
@@ -355,7 +352,7 @@ export default class EzImagePlugin extends Plugin {
       img.onload = () => {
         URL.revokeObjectURL(url);
         try {
-          const canvas = document.createElement('canvas');
+          const canvas = window.activeDocument.createElement('canvas');
           canvas.width  = img.naturalWidth;
           canvas.height = img.naturalHeight;
           const ctx = canvas.getContext('2d');
@@ -370,7 +367,7 @@ export default class EzImagePlugin extends Plugin {
             1.0  // quality = lossless for PNG; ignored for formats that don't support it
           );
         } catch (e) {
-          reject(e);
+          reject(e instanceof Error ? e : new Error(String(e)));
         }
       };
 
@@ -401,11 +398,11 @@ export default class EzImagePlugin extends Plugin {
         if (this.isAuthError(e)) throw e;
         if (attempt < maxRetries) {
           // Brief back-off: 1s, then 2s
-          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          await new Promise(r => window.setTimeout(r, 1000 * (attempt + 1)));
         }
       }
     }
-    throw lastError;
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
   /** Returns true if the error looks like a credential / permission failure. */
@@ -436,7 +433,11 @@ export default class EzImagePlugin extends Plugin {
       const baseName = file.name.replace(/\.[^.]+$/, '') || `image-${Date.now()}`;
 
       // Resolve attachment folder from Obsidian's vault config
-      const attachCfg = (this.app.vault as any).getConfig?.('attachmentFolderPath') as string ?? '';
+      const vaultWithConfig = this.app.vault as typeof this.app.vault & {
+        getConfig?: (key: string) => unknown;
+      };
+      const configuredAttachmentPath = vaultWithConfig.getConfig?.('attachmentFolderPath');
+      const attachCfg = typeof configuredAttachmentPath === 'string' ? configuredAttachmentPath : '';
       let folderPath: string;
       if (attachCfg === '.' || attachCfg === './') {
         folderPath = view.file?.parent?.path ?? '';
@@ -496,12 +497,14 @@ export default class EzImagePlugin extends Plugin {
     if (this.settings.localSaveByDefault) {
       setIcon(el, 'hard-drive');
       el.createSpan({ text: ' Local Save' });
-      el.style.opacity = '1';
+      el.removeClass('ezimage-status-upload');
+      el.addClass('ezimage-status-local');
       el.title = t('statusBarLocalTitle');
     } else {
       setIcon(el, 'cloud-upload');
       el.createSpan({ text: ' EzImage' });
-      el.style.opacity = '0.5';
+      el.removeClass('ezimage-status-local');
+      el.addClass('ezimage-status-upload');
       el.title = t('statusBarUploadTitle');
     }
   }

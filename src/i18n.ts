@@ -1,3 +1,4 @@
+import { getLanguage } from 'obsidian';
 import type { AppLanguage } from './types';
 
 // Module-level override — set by the plugin on load and on settings change.
@@ -11,8 +12,8 @@ export function setLocale(lang: AppLanguage): void {
 function getLocale(): 'zh' | 'en' {
   if (_langOverride === 'zh') return 'zh';
   if (_langOverride === 'en') return 'en';
-  // auto: read Obsidian's stored language
-  const lang = window.localStorage.getItem('language') ?? 'en';
+  // auto: follow Obsidian's public language API
+  const lang = getLanguage();
   return lang.startsWith('zh') ? 'zh' : 'en';
 }
 
