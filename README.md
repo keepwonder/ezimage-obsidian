@@ -8,7 +8,7 @@
   <p>
     <img src="https://img.shields.io/github/manifest-json/v/keepwonder/ezimage-obsidian?color=blue&label=Version" alt="Version" />
     <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-brightgreen.svg" alt="Platform" />
-    <img src="https://img.shields.io/badge/Obsidian-%3E%3D1.8.7-purple.svg" alt="Obsidian" />
+    <img src="https://img.shields.io/badge/Obsidian-%3E%3D1.13.0-purple.svg" alt="Obsidian" />
     <img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License" />
   </p>
 
@@ -53,7 +53,7 @@
 
 ### Method B: Manual (BRAT / direct)
 
-1. Download `main.js`, `main.css`, and `manifest.json` from [GitHub Releases](https://github.com/keepwonder/ezimage-obsidian/releases).
+1. Download `main.js`, `styles.css`, and `manifest.json` from [GitHub Releases](https://github.com/keepwonder/ezimage-obsidian/releases).
 2. Copy both files to `<your-vault>/.obsidian/plugins/ezimage/`.
 3. Reload Obsidian and enable the plugin under **Settings → Community Plugins**.
 
@@ -161,7 +161,7 @@ npm run dev
 npm run build
 ```
 
-Copy `main.js`, `main.css`, and `manifest.json` into your vault's plugin folder to test locally.
+Copy `main.js`, `styles.css`, and `manifest.json` into your vault's plugin folder to test locally.
 
 ---
 

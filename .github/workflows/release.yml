@@ -33,7 +33,7 @@ jobs:
         with:
           subject-path: |
             main.js
-            main.css
+            styles.css
 
       - name: Create release
         env:
@@ -45,4 +45,4 @@ jobs:
           gh release create "$tag" \
             --title "$tag" \
             --notes "$notes" \
-            main.js main.css manifest.json
+            main.js styles.css manifest.json

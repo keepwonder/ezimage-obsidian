@@ -11,8 +11,8 @@ If you want to view the source, please visit the github repository.
 
 const prod = process.argv[2] === "production";
 
-// Obsidian loads main.css as a release asset; keep CSS out of the JS bundle.
-copyFileSync("src/styles.css", "main.css");
+// Obsidian loads styles.css as a release asset; keep CSS out of the JS bundle.
+copyFileSync("src/styles.css", "styles.css");
 
 const context = await esbuild.context({
   banner: {

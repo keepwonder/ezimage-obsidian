@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.8] - 2026-06-21
+
+### Fixed
+- Publish the stylesheet under Obsidian's supported `styles.css` asset name
+- Replace the deprecated imperative settings tab with the Obsidian 1.13 declarative settings API
+- Remove deprecated slider tooltip usage
+- Validate persisted plugin data before assigning it to typed settings
+
+### Changed
+- Require Obsidian 1.13.0 or newer for the declarative settings API
+
 ## [1.1.7] - 2026-06-21
 
 ### Fixed

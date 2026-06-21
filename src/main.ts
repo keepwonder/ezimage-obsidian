@@ -531,7 +531,11 @@ export default class EzImagePlugin extends Plugin {
   // ── Settings Persistence ───────────────────────────────────────────────────
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const loaded: unknown = await this.loadData();
+    const persisted = loaded !== null && typeof loaded === 'object'
+      ? loaded as Partial<EzImageSettings>
+      : {};
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, persisted);
     this.settings.compressionExcludedExtensions = normalizeExtensionList(
       this.settings.compressionExcludedExtensions ?? DEFAULT_SETTINGS.compressionExcludedExtensions
     );
