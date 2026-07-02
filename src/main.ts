@@ -329,7 +329,7 @@ export default class EzImagePlugin extends Plugin {
 
     try {
       const url = await this.uploadImage(data, fileName, mimeType);
-      editor.replaceSelection(`![image](${url})`);
+      editor.replaceSelection(`![](${url})`);
       notice.hide();
       new Notice('EzImage: Upload successful ✓');
     } catch (e: unknown) {
