@@ -89,8 +89,19 @@ Open **Settings → EzImage** and fill in your credentials and preferences.
 | **Quality** | `85` | WebP quality (1–100) |
 | **Max File Size (MB)** | `20` | Files larger than this are rejected before upload. `0` = no limit |
 | **Path Template** | `{yyyy}/{MM}/{timestamp}-{random}.{ext}` | Upload path pattern — live preview shown in Settings |
+| **Markdown Image Template** | `![]({{url}})` | Markdown inserted after upload. Customize it to include file names or dates |
 
 **Template variables:** `{yyyy}` `{MM}` `{dd}` `{hh}` `{mm}` `{ss}` `{timestamp}` `{random}` `{name}` `{ext}`
+
+**Markdown image variables:** `{{url}}` `{{name}}` `{{fileName}}` `{{ext}}` `{{date}}` `{{time}}`
+
+Examples:
+
+```text
+![]({{url}})
+![{{name}}]({{url}})
+![{{date}}-{{name}}]({{url}})
+```
 
 ### General
 

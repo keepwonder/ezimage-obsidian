@@ -6,6 +6,7 @@ import { R2Uploader } from './uploaders/r2';
 import { EzImageSettingsTab } from './settings-tab';
 import {
   generateFilePath,
+  formatMarkdownImageLink,
   isImageProcessingExcluded,
   normalizeExtensionList,
   reconcileImageMetadata,
@@ -329,7 +330,7 @@ export default class EzImagePlugin extends Plugin {
 
     try {
       const url = await this.uploadImage(data, fileName, mimeType);
-      editor.replaceSelection(`![](${url})`);
+      editor.replaceSelection(this.formatMarkdownImageLink(url, fileName));
       notice.hide();
       new Notice('EzImage: Upload successful ✓');
     } catch (e: unknown) {
@@ -337,6 +338,10 @@ export default class EzImagePlugin extends Plugin {
       new Notice(this.formatUploadError(e));
       console.error('EzImage upload error:', e);
     }
+  }
+
+  formatMarkdownImageLink(url: string, fileName: string): string {
+    return formatMarkdownImageLink(this.settings.markdownImageTemplate, { url, fileName });
   }
 
   /**

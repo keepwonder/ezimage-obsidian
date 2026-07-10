@@ -27,6 +27,7 @@ export interface EzImageSettings {
   provider: 'r2';
   r2: R2Config;
   pathTemplate: string;
+  markdownImageTemplate: string;
   compress: boolean;
   compressionExcludedExtensions: string[];
   maxWidth: number;
@@ -47,6 +48,7 @@ export const DEFAULT_SETTINGS: EzImageSettings = {
     publicUrl: '',
   },
   pathTemplate: '{yyyy}/{MM}/{timestamp}-{random}.{ext}',
+  markdownImageTemplate: '![]({{url}})',
   compress: true,
   compressionExcludedExtensions: ['gif'],
   maxWidth: 1920,

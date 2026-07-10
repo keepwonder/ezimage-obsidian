@@ -39,6 +39,8 @@ interface Translations {
   sectionProcessing: string;
   pathTemplate: string;
   pathTemplateDesc: string;
+  markdownImageTemplate: string;
+  markdownImageTemplateDesc: string;
   compress: string;
   compressDesc: string;
   compressionExcludedExtensions: string;
@@ -68,6 +70,7 @@ interface Translations {
   errMaxWidth: string;
   errMaxFileSizeMB: string;
   pathTemplatePreviewLabel: string;
+  markdownImageTemplatePreviewLabel: string;
 
   // EXIF
   stripExif: string;
@@ -133,6 +136,8 @@ const en: Translations = {
   sectionProcessing: 'Image Processing',
   pathTemplate:      'Path Template',
   pathTemplateDesc:  'Template for the uploaded file path. Variables: {yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}',
+  markdownImageTemplate:     'Markdown Image Template',
+  markdownImageTemplateDesc: 'Template for inserted Markdown image links. Variables: {{url}} {{name}} {{fileName}} {{ext}} {{date}} {{time}}',
   compress:          'Compress Images',
   compressDesc:      'Convert images to WebP and reduce file size before uploading',
   compressionExcludedExtensions:     'Formats to Keep Original',
@@ -159,6 +164,7 @@ const en: Translations = {
   errMaxWidth:          '⚠ Must be a number ≥ 0',
   errMaxFileSizeMB:     '⚠ Must be a number ≥ 0',
   pathTemplatePreviewLabel: 'Preview: ',
+  markdownImageTemplatePreviewLabel: 'Markdown preview: ',
 
   stripExif:     'Strip EXIF Metadata',
   stripExifDesc: 'Remove GPS, device info, and other metadata before uploading. Only applies when compression is disabled — compression already strips EXIF by converting to WebP.',
@@ -219,6 +225,8 @@ const zh: Translations = {
   sectionProcessing: '图片处理',
   pathTemplate:      '路径模板',
   pathTemplateDesc:  '上传文件的路径模板，可用变量：{yyyy} {MM} {dd} {hh} {mm} {ss} {timestamp} {random} {name} {ext}',
+  markdownImageTemplate:     'Markdown 图片模板',
+  markdownImageTemplateDesc: '插入到笔记中的 Markdown 图片链接模板。可用变量：{{url}} {{name}} {{fileName}} {{ext}} {{date}} {{time}}',
   compress:          '压缩图片',
   compressDesc:      '上传前将图片转换为 WebP 格式并压缩体积',
   compressionExcludedExtensions:     '保持原格式',
@@ -245,6 +253,7 @@ const zh: Translations = {
   errMaxWidth:          '⚠ 请输入 ≥ 0 的数字',
   errMaxFileSizeMB:     '⚠ 请输入 ≥ 0 的数字',
   pathTemplatePreviewLabel: '预览：',
+  markdownImageTemplatePreviewLabel: 'Markdown 预览：',
 
   stripExif:     '清除 EXIF 元数据',
   stripExifDesc: '上传前移除 GPS 位置、设备信息等元数据，保护隐私。仅在关闭压缩时生效——开启压缩时转换为 WebP 已自动清除 EXIF。',

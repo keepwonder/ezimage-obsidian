@@ -226,7 +226,7 @@ export class BatchUploadModal extends Modal {
             start: img.start,
             end: img.end,
             expected: img.wikilink,
-            text: `![](${url})`,
+            text: this.plugin.formatMarkdownImageLink(url, imageFile.name),
           });
         }
 

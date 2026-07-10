@@ -4,6 +4,8 @@ export function generateRandom(length = 8): string {
   return Math.random().toString(36).substring(2, 2 + length);
 }
 
+export const DEFAULT_MARKDOWN_IMAGE_TEMPLATE = '![]({{url}})';
+
 export function sanitizePathSegment(value: string, fallback = 'image'): string {
   const sanitized = value
     .normalize('NFKD')
@@ -47,6 +49,59 @@ export function generateFilePath(originalName: string, template: string): string
   let result = template;
   for (const [key, value] of Object.entries(variables)) {
     // Use split/join instead of RegExp to avoid regex injection from filenames
+    result = result.split(key).join(value);
+  }
+  return result;
+}
+
+export interface MarkdownImageLinkContext {
+  url: string;
+  fileName: string;
+  now?: Date;
+}
+
+function getFileNameParts(fileName: string): { name: string; fileName: string; ext: string } {
+  const trimmed = fileName.trim();
+  const baseFileName = trimmed || 'image';
+  const dotIndex = baseFileName.lastIndexOf('.');
+  const name = dotIndex > 0 ? baseFileName.slice(0, dotIndex) : baseFileName;
+  const ext = dotIndex > 0 ? baseFileName.slice(dotIndex + 1).toLowerCase() : '';
+  return { name, fileName: baseFileName, ext };
+}
+
+function escapeMarkdownTemplateText(value: string): string {
+  return value
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/\\/g, '\\\\')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]');
+}
+
+/** Render the Markdown image link inserted after upload. */
+export function formatMarkdownImageLink(template: string, context: MarkdownImageLinkContext): string {
+  const now = context.now ?? new Date();
+  const { name, fileName, ext } = getFileNameParts(context.fileName);
+  const resolvedTemplate = template.trim() || DEFAULT_MARKDOWN_IMAGE_TEMPLATE;
+
+  const variables: Record<string, string> = {
+    '{{url}}': context.url,
+    '{{name}}': escapeMarkdownTemplateText(name),
+    '{{fileName}}': escapeMarkdownTemplateText(fileName),
+    '{{ext}}': escapeMarkdownTemplateText(ext),
+    '{{date}}': [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0'),
+    ].join('-'),
+    '{{time}}': [
+      String(now.getHours()).padStart(2, '0'),
+      String(now.getMinutes()).padStart(2, '0'),
+      String(now.getSeconds()).padStart(2, '0'),
+    ].join('-'),
+  };
+
+  let result = resolvedTemplate;
+  for (const [key, value] of Object.entries(variables)) {
     result = result.split(key).join(value);
   }
   return result;

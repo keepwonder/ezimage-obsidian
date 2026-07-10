@@ -93,8 +93,19 @@
 | **压缩质量** | `85` | WebP 质量（1–100） |
 | **最大文件大小（MB）** | `20` | 超过此大小的文件将在上传前被拒绝，`0` 表示不限制 |
 | **路径模板** | `{yyyy}/{MM}/{timestamp}-{random}.{ext}` | 上传路径模板，设置页实时预览 |
+| **Markdown 图片模板** | `![]({{url}})` | 上传后插入笔记的 Markdown，可自定义文件名或日期 |
 
 **模板变量：** `{yyyy}` `{MM}` `{dd}` `{hh}` `{mm}` `{ss}` `{timestamp}` `{random}` `{name}` `{ext}`
+
+**Markdown 图片变量：** `{{url}}` `{{name}}` `{{fileName}}` `{{ext}}` `{{date}}` `{{time}}`
+
+示例：
+
+```text
+![]({{url}})
+![{{name}}]({{url}})
+![{{date}}-{{name}}]({{url}})
+```
 
 ## <span id="usage"></span>🚀 使用方式
 

@@ -2,7 +2,7 @@ import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import type EzImagePlugin from './main';
 import type { AppLanguage } from './types';
 import { t, setLocale } from './i18n';
-import { generateFilePath, normalizeExtensionList } from './utils';
+import { DEFAULT_MARKDOWN_IMAGE_TEMPLATE, formatMarkdownImageLink, generateFilePath, normalizeExtensionList } from './utils';
 
 export class EzImageSettingsTab extends PluginSettingTab {
   plugin: EzImagePlugin;
@@ -117,6 +117,34 @@ export class EzImageSettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           })
       );
+
+    const markdownPreviewEl = containerEl.createEl('p', {
+      cls: ['setting-item-description', 'ezimage-template-preview'],
+      text: t('markdownImageTemplatePreviewLabel') + formatMarkdownImageLink(
+        this.plugin.settings.markdownImageTemplate,
+        { url: 'https://images.example.com/example.png', fileName: 'example.png' }
+      ),
+    });
+
+    new Setting(containerEl)
+      .setName(t('markdownImageTemplate'))
+      .setDesc(t('markdownImageTemplateDesc'))
+      .addText(text => {
+        text
+          .setPlaceholder(DEFAULT_MARKDOWN_IMAGE_TEMPLATE)
+          .setValue(this.plugin.settings.markdownImageTemplate)
+          .onChange(async value => {
+            const tpl = value.trim() || DEFAULT_MARKDOWN_IMAGE_TEMPLATE;
+            this.plugin.settings.markdownImageTemplate = tpl;
+            markdownPreviewEl.textContent = t('markdownImageTemplatePreviewLabel') + formatMarkdownImageLink(
+              tpl,
+              { url: 'https://images.example.com/example.png', fileName: 'example.png' }
+            );
+            await this.plugin.saveSettings();
+          });
+        text.inputEl.addClass('ezimage-input-wide');
+        return text;
+      });
 
     new Setting(containerEl)
       .setName(t('compress'))

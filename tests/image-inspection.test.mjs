@@ -11,7 +11,7 @@ const result = await esbuild.build({
 const module = { exports: {} };
 new Function('module', 'exports', result.outputFiles[0].text)(module, module.exports);
 
-const { inspectImageData, normalizeExtensionList, reconcileImageMetadata } = module.exports;
+const { formatMarkdownImageLink, inspectImageData, normalizeExtensionList, reconcileImageMetadata } = module.exports;
 const arrayBuffer = buffer => buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 
 // Minimal two-frame GIF. The misleading JPEG name reproduces the reported case.
@@ -59,5 +59,27 @@ assert.equal(correctedJpeg.resolvedMimeType, 'image/jpeg');
 assert.equal(correctedJpeg.animated, false);
 
 assert.deepEqual(normalizeExtensionList('.GIF, webp; SVG gif'), ['gif', 'webp', 'svg']);
+
+const fixedDate = new Date('2026-07-10T09:08:07');
+assert.equal(
+  formatMarkdownImageLink('', { url: 'https://images.example.com/a.png', fileName: 'a.png', now: fixedDate }),
+  '![](https://images.example.com/a.png)'
+);
+assert.equal(
+  formatMarkdownImageLink('![{{name}}]({{url}})', {
+    url: 'https://images.example.com/my-photo.webp',
+    fileName: 'my-photo.jpg',
+    now: fixedDate,
+  }),
+  '![my-photo](https://images.example.com/my-photo.webp)'
+);
+assert.equal(
+  formatMarkdownImageLink('![{{date}} {{time}} {{fileName}} {{ext}}]({{url}})', {
+    url: 'https://images.example.com/photo.png',
+    fileName: 'weird [name].png',
+    now: fixedDate,
+  }),
+  '![2026-07-10 09-08-07 weird \\[name\\].png png](https://images.example.com/photo.png)'
+);
 
 console.log('Image inspection regression tests passed.');
