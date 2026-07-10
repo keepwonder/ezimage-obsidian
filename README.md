@@ -34,7 +34,7 @@
 
 - **🖼️ Seamless Paste Interception** — Paste an image anywhere in your notes; EzImage intercepts the event before Obsidian, then either uploads it or saves it locally depending on the current mode.
 - **🖱️ Drag & Drop Support** — Drag image files directly from Finder / Explorer into the editor. EzImage copies the file into your vault or uploads it — not just references the original path.
-- **☁️ Upload Mode** — Images are uploaded to Cloudflare R2 and a `![image](url)` link is inserted. Zero local files, zero broken paths.
+- **☁️ Upload Mode** — Images are uploaded to Cloudflare R2 and a `![](url)` link is inserted. Zero local files, zero broken paths.
 - **💾 Local Save Mode** — Images are saved to your vault's configured attachment folder and inserted as `![[wikilink]]`. Fully managed by Obsidian's native structure.
 - **⚡ Mode Toggle** — Switch between Upload and Local Save mode via the Settings toggle or Command Palette (`EzImage: Toggle Local Save Mode`). The status bar always shows the current mode at a glance.
 - **📉 Automatic WebP Compression** — Powered by `browser-image-compression`. Images are converted to WebP and resized before upload, reducing file size without visible quality loss. EXIF metadata is stripped automatically during conversion.

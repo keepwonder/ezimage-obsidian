@@ -32,7 +32,7 @@
 
 ## <span id="features"></span>✨ 功能特性
 
-- **🖼️ 无感粘贴拦截** — 在笔记中粘贴图片，EzImage 在 Obsidian 本地保存之前拦截事件，上传图片并自动插入 `![image](url)`。
+- **🖼️ 无感粘贴拦截** — 在笔记中粘贴图片，EzImage 在 Obsidian 本地保存之前拦截事件，上传图片并自动插入 `![](url)`。
 - **🖱️ 拖拽上传** — 直接从 Finder / 文件管理器将图片拖入编辑器，自动上传。
 - **💾 本地保存模式** — 在设置页开启或通过命令面板（`EzImage: Toggle Local Save Mode`）切换到本地保存模式，此时粘贴和拖拽均走 Obsidian 默认行为，图片保存到 vault 本地。状态栏始终显示当前模式。
 - **📉 自动 WebP 压缩** — 基于 `browser-image-compression`，上传前自动转为 WebP 并按需缩放，压缩体积的同时自动清除 EXIF 元数据。
@@ -114,7 +114,7 @@
 
 | 图标 | 模式 | 行为 |
 | :--- | :--- | :--- |
-| ☁️ EzImage | 上传模式（默认）| 粘贴 / 拖拽 → 上传到 R2，插入 `![image](url)` |
+| ☁️ EzImage | 上传模式（默认）| 粘贴 / 拖拽 → 上传到 R2，插入 `![](url)` |
 | 💾 Local Save | 本地保存模式 | 粘贴 / 拖拽 → 保存到 vault，插入 `![[filename]]` |
 
 切换模式请使用**设置页面 toggle** 或**命令面板 → `EzImage: Toggle Local Save Mode`**（可绑定快捷键）。状态栏 tooltip 跟随配置的语言显示。
